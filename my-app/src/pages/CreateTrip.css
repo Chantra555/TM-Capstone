@@ -1,0 +1,57 @@
+/* CreateTrip.css */
+
+/* Container */
+.create-trip-container {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Georgia, serif;
+  padding: 1rem;
+}
+
+/* Section Tabs */
+.section-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.section-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.section-tab.active {
+  border: 2px solid #1A1A18;
+  background: #F3F1EC;
+}
+
+/* Section Items */
+.section-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* Add Button */
+.add-button {
+  margin-top: 20px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #1A1A18;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.add-button:hover {
+  background: #333;
+}
