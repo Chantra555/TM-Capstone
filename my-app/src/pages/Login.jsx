@@ -23,30 +23,29 @@ export default function Login({ onLogin }) {
 
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
+      if (!response.ok) throw new Error("Request failed");
 
       const data = await response.json();
 
       console.log("Success:", data);
 
-      // store logged in user
       if (!isSignup && onLogin) {
-        onLogin(data);
-        navigate("/create");
+        // -----------------------------
+        // STORE INFO FOR PERSISTENT LOGIN
+        localStorage.setItem("token", data.token); // backend should return token
+        localStorage.setItem("user", data.username);
+
+        onLogin(data.username); // update App.jsx state
+        navigate("/"); // <-- redirect to Dashboard
+        // -----------------------------
       }
 
-      // optional: after signup switch to login
-      if (isSignup) {
-        setIsSignup(false);
-      }
+      // Optional: after signup, switch to login
+      if (isSignup) setIsSignup(false);
 
     } catch (error) {
       console.error(error);
@@ -89,9 +88,7 @@ export default function Login({ onLogin }) {
         </button>
 
         <p className="login-footer">
-          {isSignup
-            ? "Already have an account?"
-            : "Don't have an account?"}{" "}
+          {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <span
             className="signup-link"
             style={{ cursor: "pointer" }}

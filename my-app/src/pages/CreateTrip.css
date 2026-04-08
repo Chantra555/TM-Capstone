@@ -1,57 +1,87 @@
-/* CreateTrip.css */
+/* ____________________ Create Trip Layout */
 
-/* Container */
-.create-trip-container {
-  max-width: 800px;
-  margin: 0 auto;
-  font-family: Georgia, serif;
-  padding: 1rem;
-}
-
-/* Section Tabs */
-.section-tabs {
+.create-trip-page {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  height: calc(100vh - 80px);
+  background: #f5f3ef;
 }
 
-.section-tab {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
+/* Sidebar */
+.trip-sidebar {
+  width: 240px;
+  background: #0f0f0f;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.section-tab.active {
-  border: 2px solid #1A1A18;
-  background: #F3F1EC;
+.trip-sidebar h2 {
+  font-family: "Georgia", serif;
+  font-weight: 400;
+  color: #f5f3ef;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
 }
 
-/* Section Items */
-.section-item {
-  padding: 10px;
-  margin-bottom: 8px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fff;
-}
-
-/* Add Button */
-.add-button {
-  margin-top: 20px;
-  padding: 8px 16px;
-  border-radius: 8px;
-  background: #1A1A18;
-  color: #fff;
+/* Sidebar buttons */
+.trip-sidebar button {
+  background: none;
   border: none;
+  color: #b7b5ae;
+  text-align: left;
+  padding: 12px 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-.add-button:hover {
-  background: #333;
+.trip-sidebar button:hover {
+  color: #f5f3ef;
+}
+
+/* gold underline */
+.trip-sidebar button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 6px;
+  width: 0%;
+  height: 1px;
+  background: #c6a769;
+  transition: width 0.3s ease;
+}
+
+.trip-sidebar button:hover::after {
+  width: 100%;
+}
+
+/* Content area */
+.trip-content {
+  flex: 1;
+  padding: 3rem;
+}
+
+.trip-content h1 {
+  font-family: "Georgia", serif;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  color: #1a1a18;
+}
+
+/* inputs reuse your style */
+.trip-content input {
+  display: block;
+  width: 320px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #e0ddd6;
+  border-radius: 8px;
+}
+
+.trip-content input:focus {
+  border: 1px solid #c6a769;
+  outline: none;
 }

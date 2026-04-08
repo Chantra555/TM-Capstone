@@ -198,3 +198,106 @@ button {
   color: hsl(290, 65%, 38%);
   cursor: pointer;
 }
+
+/* ____________________ Create Trip Layout */
+
+.create-trip-page {
+  display: flex;
+  height: calc(100vh - 80px);
+  background: #f5f3ef;
+}
+
+/* Sidebar */
+.trip-sidebar {
+  width: 240px;
+  background: #0f0f0f;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.trip-sidebar h2 {
+  font-family: "Georgia", serif;
+  font-weight: 400;
+  color: #f5f3ef;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+/* Sidebar buttons */
+.trip-sidebar button {
+  background: none;
+  border: none;
+  color: #b7b5ae;
+  text-align: left;
+  padding: 12px 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.trip-sidebar button:hover {
+  color: #f5f3ef;
+}
+
+/* gold underline */
+.trip-sidebar button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 6px;
+  width: 0%;
+  height: 1px;
+  background: #c6a769;
+  transition: width 0.3s ease;
+}
+
+.trip-sidebar button:hover::after {
+  width: 100%;
+}
+
+/* Content area */
+.trip-content {
+  flex: 1;
+  padding: 3rem;
+}
+
+.trip-content h1 {
+  font-family: "Georgia", serif;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  color: #1a1a18;
+}
+
+/* inputs reuse your style */
+.trip-content input {
+  display: block;
+  width: 320px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #e0ddd6;
+  border-radius: 8px;
+}
+
+.trip-content input:focus {
+  border: 1px solid #c6a769;
+  outline: none;
+}
+
+.theme-button {
+  background: #1a1a18;        /* dark base like login button */
+  color: white;               /* white text */
+  border: none;
+  border-radius: 2px;
+  padding: 12px 20px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+}
+

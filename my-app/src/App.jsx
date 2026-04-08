@@ -9,19 +9,31 @@ import "./style.css";
 
 
 function App() {
-  const[use,setUser] = useState(null);
+  // use null as initial state safely
+  const [user, setUser] = useState(() => {
+    try {
+      return localStorage.getItem("user") || null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+  };
+
   return (
     <BrowserRouter>
-      <Navbar />
+      <Navbar user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/create" element={<CreateTrip />} />
-       <Route path="/login" element={<Login onLogin={setUser} />} />
+        <Route path="/login" element={<Login onLogin={setUser} />} />
       </Routes>
     </BrowserRouter>
-    
   );
-  
 }
 
 export default App;

@@ -1,102 +1,97 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+// import TripInfo from "../componets/TripInfo"
+// import Destinations from "../componets/Destinations";
+// import Itenirary from "../componets/Itenirary"; 
+import Budget from "../componets/Budget";
+// import Notes from "../componets/Notes";
 
 export default function CreateTrip() {
+  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState("info");
+
   const [trip, setTrip] = useState({
     name: "",
-    destination: "",
-    startDate: "",
-    endDate: ""
+    notes: "",
+    destinations: [],
+    activities: [],
+    budget: ""
   });
 
-  const handleChange = (e) => {
-    setTrip({ ...trip, [e.target.name]: e.target.value });
-  };
+  const isLoggedIn = localStorage.getItem("token");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(trip);
+  const handleSave = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    console.log("Saving trip:", trip);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Create Trip</h1>
+    <div className="create-trip-page">
 
-      <input name="name" placeholder="Trip Name" onChange={handleChange} />
-      <input name="destination" placeholder="Destination" onChange={handleChange} />
-      <input type="date" name="startDate" onChange={handleChange} />
-      <input type="date" name="endDate" onChange={handleChange} />
+      {/* NOT LOGGED IN VIEW */}
+      {!isLoggedIn && (
+        <div className="trip-content">
+          <h1>Create Trip</h1>
+          <p className="login-warning">
+            Please login to create and save a trip
+          </p>
 
-      <button type="submit">Create Trip</button>
-    </form>
+            <button
+      className="theme-button"
+      onClick={() => navigate("/login")}
+    >
+      Go to Login
+    </button>
+  </div>
+      )}
+
+      {/* LOGGED IN VIEW */}
+      {isLoggedIn && (
+        <>
+          {/* Sidebar */}
+          <div className="trip-sidebar">
+            {/* <button onClick={() => setActiveTab("info")}>Trip Info</button>
+            <button onClick={() => setActiveTab("destinations")}>Destinations</button>
+            <button onClick={() => setActiveTab("itenirary")}>Itenirary</button> */}
+            <button onClick={() => setActiveTab("budget")}>Budget</button>
+            {/* <button onClick={() => setActiveTab("notes")}>Notes</button> */}
+
+            <button onClick={handleSave}>
+              Save Trip
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="trip-content">
+            {/* {activeTab === "info" && (
+              <TripInfo trip={trip} setTrip={setTrip} />
+            )}
+
+            {activeTab === "destinations" && (
+              <Destinations trip={trip} setTrip={setTrip} />
+            )}
+
+            {activeTab === "itenirary" && (
+              <Itenirary trip={trip} setTrip={setTrip} />
+            )} */}
+
+            {activeTab === "budget" && (
+              <Budget trip={trip} setTrip={setTrip} />
+            )}
+
+            {/* {activeTab === "notes" && (
+              <Notes trip={trip} setTrip={setTrip} />
+            )} */}
+          </div>
+        </>
+      )}
+
+    </div>
   );
 }
-
-// import { useState } from "react";
-// import AddActivityModal from "./AddActivityModal";
-// import { TYPES, INITIAL_DAYS } from "./data";
-// import "./CreateTrip.css"; // Import the CSS
-
-// export default function CreateTrip({ isLoggedIn }) {
-//   const [activeSection, setActiveSection] = useState("sight");
-//   const [showModal, setShowModal] = useState(false);
-//   const [items, setItems] = useState(INITIAL_DAYS[0].items);
-
-//   function handleAddItem(data) {
-//     setItems([...items, { id: Date.now(), ...data }]);
-//     setShowModal(false);
-//   }
-
-//   const filteredItems = items.filter(item => item.type === activeSection);
-
-//   if (!isLoggedIn) {
-//     return (
-//       <div style={{ padding: 40 }}>
-//         <h2>Please log in to create a trip</h2>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="create-trip-container">
-      
-//       {/* Section tabs */}
-//       <div className="section-tabs">
-//         {TYPES.map(t => (
-//           <button
-//             key={t.key}
-//             onClick={() => setActiveSection(t.key)}
-//             className={`section-tab ${activeSection === t.key ? "active" : ""}`}
-//           >
-//             {t.label}
-//           </button>
-//         ))}
-//       </div>
-
-//       {/* Section items */}
-//       <div>
-//         {filteredItems.map(item => (
-//           <div key={item.id} className="section-item">
-//             <strong>{item.title}</strong> — {item.time}
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Add button */}
-//       <button
-//         onClick={() => setShowModal(true)}
-//         className="add-button"
-//       >
-//         + Add {TYPES.find(t => t.key === activeSection).label}
-//       </button>
-
-//       {/* Modal */}
-//       {showModal && (
-//         <AddActivityModal
-//           onClose={() => setShowModal(false)}
-//           onAdd={(data) => handleAddItem({ ...data, type: activeSection })}
-//         />
-//       )}
-//     </div>
-//   );
-// }
-// // 
