@@ -1,87 +1,178 @@
-/* ____________________ Create Trip Layout */
-
 .create-trip-page {
   display: flex;
-  height: calc(100vh - 80px);
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  min-height: 80vh;
   background: #f5f3ef;
 }
 
-/* Sidebar */
-.trip-sidebar {
-  width: 240px;
-  background: #0f0f0f;
-  padding: 2rem;
+/* + New Trip card */
+.new-trip-card {
+  border: 2px dashed #c6a769;
+  padding: 3rem;
+  text-align: center;
+  cursor: pointer;
+  width: 320px;
+  border-radius: 16px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a18;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.new-trip-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+/* form box */
+.trip-form-card {
+  border: 1px solid #1a1a18;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 360px;
+  background: #fff;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
-}
-
-.trip-sidebar h2 {
-  font-family: "Georgia", serif;
-  font-weight: 400;
-  color: #f5f3ef;
-  margin-bottom: 2rem;
-  letter-spacing: 0.05em;
-}
-
-/* Sidebar buttons */
-.trip-sidebar button {
-  background: none;
-  border: none;
-  color: #b7b5ae;
-  text-align: left;
-  padding: 12px 0;
-  font-size: 0.9rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
+  gap: 1rem;
   position: relative;
-  transition: color 0.3s ease;
+  overflow: ;
 }
 
-.trip-sidebar button:hover {
-  color: #f5f3ef;
-}
-
-/* gold underline */
-.trip-sidebar button::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 6px;
-  width: 0%;
-  height: 1px;
-  background: #c6a769;
-  transition: width 0.3s ease;
-}
-
-.trip-sidebar button:hover::after {
-  width: 100%;
-}
-
-/* Content area */
-.trip-content {
-  flex: 1;
-  padding: 3rem;
-}
-
-.trip-content h1 {
-  font-family: "Georgia", serif;
-  font-weight: 400;
-  margin-bottom: 1.5rem;
-  color: #1a1a18;
-}
-
-/* inputs reuse your style */
-.trip-content input {
-  display: block;
-  width: 320px;
-  margin-bottom: 12px;
-  padding: 12px;
-  border: 1px solid #e0ddd6;
+/* inputs */
+.trip-form-card input {
+  padding: 10px;
   border-radius: 8px;
+  border: 1px solid #e0ddd6;
+  outline: none;
 }
 
-.trip-content input:focus {
+/* button */
+.trip-form-card button {
+  padding: 12px;
+  background: #1a1a18;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.trip-form-card button:hover {
+  background: #000;
+}
+.react-datepicker-popper {
+  z-index: 10;
+}
+
+/* success box */
+.trip-created-card {
   border: 1px solid #c6a769;
-  outline: none;
+  padding: 2rem;
+  text-align: center;
+  width: 320px;
+  margin-top: 2rem;
+  border-radius: 16px;
+  background: #f5f3ef;
+  color: #1a1a18;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+/* Remove arrows in Chrome, Safari, Edge */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove arrows in Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.login-link{
+  font-family: 'Courier New', Courier, monospace;
+}
+/* ---------- Tablet ---------- */
+@media (max-width: 768px) {
+  .new-trip-card {
+    width: 280px;
+    padding: 2.5rem;
+    font-size: 1.3rem;
+  }
+
+  .trip-form-card {
+    width: 300px;
+    padding: 2rem;
+  }
+
+  .trip-created-card {
+    width: 280px;
+  }
+}
+
+
+/* ---------- Mobile ---------- */
+@media (max-width: 480px) {
+  .create-trip-page {
+    padding: 1.5rem 1rem;
+  }
+
+  .new-trip-card {
+    width: 100%;
+    max-width: 320px;
+    padding: 2rem;
+    font-size: 1.2rem;
+  }
+
+  .trip-form-card {
+    width: 100%;
+    max-width: 320px;
+    padding: 1.5rem;
+  }
+
+  .trip-created-card {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .trip-form-card input {
+    font-size: 14px;
+    padding: 9px;
+  }
+
+  .trip-form-card button {
+    padding: 11px;
+    font-size: 14px;
+  }
+}
+/* ---------- Desktop ---------- */
+@media (min-width: 1024px) {
+  .trip-form-card {
+    width: 420px;
+    padding: 3rem;
+  }
+
+  .new-trip-card {
+    width: 380px;
+    padding: 3.5rem;
+    font-size: 1.6rem;
+  }
+
+  .trip-created-card {
+    width: 360px;
+  }
+
+  .trip-form-card input {
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .trip-form-card button {
+    padding: 14px;
+    font-size: 15px;
+  }
 }
