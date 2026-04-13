@@ -5,6 +5,7 @@ import com.muro.dto.UserRequest;
 import com.muro.dto.UserResponse;
 import com.muro.entity.User;
 import com.muro.service.UserService;
+import com.muro.security.JwtUtil;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -44,12 +45,13 @@ public class AuthController {
      * Login existing user
      */
     @PostMapping("/login")
-    public UserResponse login(@RequestBody LoginRequest request) {
+    public String login(@RequestBody LoginRequest request) {
         try {
             User user = userService.login(request.getUsername(), request.getPassword());
-            return new UserResponse(user.getId(), user.getUsername(), user.getName());
+
+            return JwtUtil.generateToken(user.getUsername());
+
         } catch (IllegalArgumentException e) {
-            // Wrong username/password
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
     }

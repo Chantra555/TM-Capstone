@@ -1,4 +1,45 @@
 package com.muro.controller;
 
-public class TripConroller {
+import com.muro.dto.TripDTO;
+import com.muro.entity.Trip;
+import com.muro.entity.User;
+import com.muro.repository.TripRepository;
+import com.muro.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+
+@RestController
+@RequestMapping("/api/trips")
+@CrossOrigin(origins = "http://localhost:5173")
+
+public class TripController {
+
+    @Autowired
+    private TripRepository tripRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostMapping
+    public ResponseEntity<String> createTrip(@RequestBody Trip trip, Principal principal) {
+
+        String username = principal.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        trip.setUser(user);
+
+        Trip saved = tripRepository.save(trip);
+
+        // 🔥 ADD THIS LINE HERE
+        System.out.println("SAVED TRIP ID = " + saved.getId());
+
+        return ResponseEntity.ok("Trip created successfully");
+    }
+
+
 }

@@ -6,6 +6,7 @@ import "./createTrip.css";
 
 export default function CreateTrip() {
   const navigate = useNavigate();
+
   const [showForm, setShowForm] = useState(false);
   const [tripCreated, setTripCreated] = useState(false);
 
@@ -15,50 +16,83 @@ export default function CreateTrip() {
   const [trip, setTrip] = useState({
     name: "",
     location: "",
-    startDate: "",
-    endDate: "",
     idealBudget: "",
   });
 
   const isLoggedIn = localStorage.getItem("token");
 
+  // Handle text inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTrip({ ...trip, [name]: value });
   };
 
-  const handleSave = () => {
+  // Format date for backend (YYYY-MM-DD)
+  const formatDate = (date) => {
+    return date ? date.toISOString().split("T")[0] : null;
+  };
+
+  // Handle start date change
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+
+    if (endDate && date > endDate) {
+      setEndDate(null);
+    }
+  };
+
+  // Save trip to backend
+  const handleSave = async () => {
     if (!isLoggedIn) {
       alert("Please login to save your trip");
       navigate("/login");
       return;
     }
-      if (endDate < startDate) {
-    alert("End date cannot be before start date");
-    return;
-  }
 
-  if (!trip.name){
-    alert("Trip name must not be empty");
-    return;
-  }
+    if (!trip.name) {
+      alert("Trip name must not be empty");
+      return;
+    }
 
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates");
+      return;
+    }
 
+    if (endDate < startDate) {
+      alert("End date cannot be before start date");
+      return;
+    }
 
-    console.log("Saving trip:", trip);
-    setTripCreated(true);
+    const tripData = {
+      ...trip,
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate),
+    };
+
+    try {
+      const response = await fetch("http://localhost:8081/api/trips", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(tripData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save trip");
+      }
+
+      const data = await response.text();
+      console.log("Saved trip:", data);
+
+      setTripCreated(true);
+    } catch (error) {
+      console.error(error);
+      alert("Error saving trip");
+    }
   };
-  const handleStartDateChange = (date) => {
-  setStartDate(date);
-
-  if (endDate && date > endDate) {
-    setEndDate(null);
-  }
-};
-
-
-
-
 
   return (
     <div className="create-trip-page">
@@ -100,13 +134,9 @@ export default function CreateTrip() {
             className="input-field"
           />
 
-
           <DatePicker
             selected={endDate}
-            onChange={(date) => {
-              setEndDate(date);
-              setTrip({ ...trip, endDate: date });
-            }}
+            onChange={(date) => setEndDate(date)}
             placeholderText="End Date"
             className="input-field"
           />
@@ -123,10 +153,12 @@ export default function CreateTrip() {
             <button onClick={handleSave}>Save Trip</button>
           ) : (
             <div className="login-link">
-              
-              <Link to="/login" 
-              style={{ color: "red", marginBottom: "0.5rem" }}
-              >login required to save trip </Link>
+              <Link
+                to="/login"
+                style={{ color: "red", marginBottom: "0.5rem" }}
+              >
+                login required to save trip
+              </Link>
             </div>
           )}
         </div>
@@ -134,19 +166,27 @@ export default function CreateTrip() {
 
       {/* Confirmation */}
       {tripCreated && (
-  <div
-    className="trip-created-card"
-    onClick={() => {
-      setTripCreated(false);
-      setShowForm(false);
-    }}
-    style={{ cursor: "pointer" }}
-  >
-    <h2>🎉 Created New Trip!</h2>
-    <p>Click to create another trip</p>
-  </div>
-)}
-       
+        <div
+          className="trip-created-card"
+          onClick={() => {
+            setTripCreated(false);
+            setShowForm(false);
+
+            // Reset form
+            setTrip({
+              name: "",
+              location: "",
+              idealBudget: "",
+            });
+            setStartDate(null);
+            setEndDate(null);
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          <h2>🎉 Created New Trip!</h2>
+          <p>Click to create another trip</p>
+        </div>
+      )}
     </div>
   );
 }

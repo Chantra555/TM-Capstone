@@ -12,44 +12,45 @@ export default function Login({ onLogin }) {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    const url = isSignup
+      ? "http://localhost:8081/api/auth/signup"
+      : "http://localhost:8081/api/auth/login";
+
+    const body = isSignup
+      ? { name, username, password }
+      : { username, password };
+
     try {
-      const url = isSignup
-        ? "http://localhost:8080/api/auth/signup"
-        : "http://localhost:8080/api/auth/login";
-
-      const body = isSignup
-        ? { name, username, password }
-        : { username, password };
-
       const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) throw new Error("Request failed");
-
-      const data = await response.json();
-
-      console.log("Success:", data);
-
-      if (!isSignup && onLogin) {
-        // -----------------------------
-        // STORE INFO FOR PERSISTENT LOGIN
-        localStorage.setItem("token", data.token); // backend should return token
-        localStorage.setItem("user", data.username);
-
-        onLogin(data.username); // update App.jsx state
-        navigate("/"); // <-- redirect to Dashboard
-        // -----------------------------
+      if (!response.ok) {
+        throw new Error(isSignup ? "Signup failed" : "Login failed");
       }
 
-      // Optional: after signup, switch to login
-      if (isSignup) setIsSignup(false);
+      if (!isSignup) {
+        const token = await response.text();
+        localStorage.setItem("token", token);
+
+
+        localStorage.setItem("user", username);
+        if (onLogin) onLogin(username);
+        navigate("/");
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Signup success:", data);
+      setIsSignup(false);
 
     } catch (error) {
       console.error(error);
-      alert(isSignup ? "Signup failed" : "Login failed");
+      alert(error.message);
     }
   }
 
@@ -74,6 +75,7 @@ export default function Login({ onLogin }) {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          required
         />
 
         <input
@@ -81,6 +83,7 @@ export default function Login({ onLogin }) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
 
         <button type="submit">

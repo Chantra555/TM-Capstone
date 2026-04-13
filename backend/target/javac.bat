@@ -1,1 +1,0 @@
-cmd.exe /X /C "C:\Users\chantra.phom\.jdks\ms-21.0.10-1\bin\javac "@C:/Users/chantra.phom/Documents/GitHub/TM Capstone/backend/target/org.codehaus.plexus.compiler.javac.JavacCompiler351830903257011056arguments""

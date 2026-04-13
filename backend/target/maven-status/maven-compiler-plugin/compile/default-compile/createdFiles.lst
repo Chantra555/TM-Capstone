@@ -2,8 +2,9 @@ com\muro\controller\AuthController.class
 com\muro\dto\UserResponse.class
 com\muro\repository\TripRepository.class
 com\muro\dto\UserRequest.class
-com\muro\controller\TripConroller.class
-com\muro\BackendApplication\BackendApplication.class
+com\muro\BackendApplication.class
+com\muro\controller\TripController.class
+com\muro\config\SecurityConfig.class
 com\muro\entity\Trip.class
 com\muro\service\TripService.class
 com\muro\repository\UserRepository.class

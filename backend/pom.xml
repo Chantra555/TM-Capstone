@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.taskboard</groupId>
+    <groupId>com.muro</groupId>
     <artifactId>taskboard</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>THing</name>
@@ -37,6 +37,23 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.3</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.3</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
