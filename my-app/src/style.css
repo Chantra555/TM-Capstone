@@ -8,6 +8,7 @@ body {
   justify-content: space-between;
   padding: 1rem;
   background: #2c3e50;
+  width: 100%;
   color: white;
 }
 
@@ -73,7 +74,8 @@ button {
   justify-content: space-between;
   align-items: center;
   padding: 1.rem 2.5rem;
-  background: #0f0f0f;
+  background: #000000;
+  width: 100em;
   border-bottom: 1px solid #1f1f1f;
 }
 

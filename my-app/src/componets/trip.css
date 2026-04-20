@@ -1,0 +1,86 @@
+/* GLOBAL RESET */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: #f6f7fb;
+  color: #111827;
+}
+
+/* PAGE WRAPPER */
+.trips-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+/* TITLE (FORCE VISIBILITY) */
+.trips-title {
+  font-size: 30px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: 400;
+  margin-bottom: 28px;
+  color: #000000;
+  letter-spacing: -0.3px;
+}
+
+/* GRID */
+.trips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+
+
+/* CARD */
+.trip-card {
+  background: #ffffff;
+  border-radius: 5px;
+  padding: 20px 22px;
+  cursor: pointer;
+
+  border: 1px solid #c6a769;
+  background-color: #fffb004f;;
+  
+
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* HOVER */
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ACTIVE CLICK */
+.trip-card:active {
+  transform: scale(0.99);
+}
+
+/* TEXT */
+.trip-name {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #111827;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.trip-dates {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* EMPTY STATE */
+.empty-text {
+  color: #6b7280;
+  font-size: 15px;
+  margin-top: 20px;
+}
+.trip-dates {
+  font-size: 13px;
+  color: #6b7280;
+  white-space: nowrap;
+ 
+}

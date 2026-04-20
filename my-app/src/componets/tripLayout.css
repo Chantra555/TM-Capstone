@@ -1,0 +1,56 @@
+/* LAYOUT */
+.trip-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f6f7fb;
+}
+
+/* SIDEBAR */
+.trip-sidebar {
+  width: 220px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  padding: 24px 16px;
+}
+
+/* TITLE */
+.trip-sidebar-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* NAV */
+.trip-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* NAV ITEM */
+.nav-item {
+  text-decoration: none;
+  color: #374151;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.15s ease;
+}
+
+/* HOVER */
+.nav-item:hover {
+  background: #f3f4f6;
+}
+
+/* ACTIVE LINK */
+.nav-item.active {
+  background: #111827;
+  color: white;
+  font-weight: 500;
+}
+
+/* CONTENT AREA */
+.trip-content {
+  flex: 1;
+  padding: 32px;
+}

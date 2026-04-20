@@ -1,0 +1,246 @@
+.budget-page {
+  max-width: 800px;
+}
+
+/* HEADER */
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.budget-header button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+}
+
+/* 🔥 TOP CARDS */
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.budget-card {
+  background: white;
+  border: 1px solid #a7c4ff;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.budget-card span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.budget-card h2 {
+  margin-top: 8px;
+  font-size: 22px;
+}
+
+/* OPTIONAL COLORS */
+.budget-card.good h2 {
+  color: #16a34a;
+}
+
+.budget-card.danger h2 {
+  color: #dc2626;
+}
+
+/* BREAKDOWN */
+.section-title {
+  margin-bottom: 10px;
+}
+
+.budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.budget-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: white;
+  border: 1px solid #f5989850;
+  border-radius: 8px;
+}
+
+.budget-row input,
+.budget-card input {
+  width: 100px;
+  padding: 4px;
+}
+/* FOOTER MATH SECTION */
+.budget-footer {
+  margin-top: 25px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.math-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.math-line.result {
+  font-weight: 700;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+  padding-top: 10px;
+}
+.budget-page {
+  max-width: 800px;
+}
+
+/* HEADER */
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.budget-header button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+}
+
+/* TOP CARDS */
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.budget-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.budget-card span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.budget-card h2 {
+  margin-top: 8px;
+  font-size: 22px;
+}
+
+.budget-card.good h2 {
+  color: #16a34a;
+}
+
+.budget-card.danger h2 {
+  color: #dc2626;
+}
+
+/* BREAKDOWN */
+.section-title {
+  margin-bottom: 10px;
+}
+
+.budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.budget-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+/* FOOTER */
+.budget-footer {
+  margin-top: 25px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.math-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.math-line.result {
+  font-weight: 700;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+  padding-top: 10px;
+}
+
+/* EMPTY STATE
+.budget-empty {
+  margin-top: 40px;
+  text-align: center;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.spent-large {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.muted {
+  color: #6b7280;
+}
+ */
+
+ .budget-add-expense {
+  margin-top: 20px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.budget-add-expense input {
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.budget-add-expense button {
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+}

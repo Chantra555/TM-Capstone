@@ -1,5 +1,6 @@
 .create-trip-page {
   display: flex;
+  font-family: Georgia, 'Times New Roman', Times, serif;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start; /* 👈 important */
@@ -17,7 +18,7 @@
   width: 320px;
   border-radius: 16px;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 550;
   color: #1a1a18;
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   transition: transform 0.3s, box-shadow 0.3s;

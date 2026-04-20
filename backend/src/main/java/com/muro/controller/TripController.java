@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/trips")
@@ -40,6 +41,29 @@ public class TripController {
 
         return ResponseEntity.ok("Trip created successfully");
     }
+    @GetMapping
+    public List<Trip> getAllTrips(Principal principal) {
+        String username = principal.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return tripRepository.findByUser(user);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getTripById(@PathVariable Long id, Principal principal) {
+        String username = principal.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return tripRepository.findByIdAndUser(id, user)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
 
 
 }
