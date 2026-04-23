@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./login.css";
 
 export default function Login({ onLogin }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -33,20 +34,34 @@ export default function Login({ onLogin }) {
         throw new Error(isSignup ? "Signup failed" : "Login failed");
       }
 
+      // =========================
+      // LOGIN FLOW
+      // =========================
       if (!isSignup) {
-        const token = await response.text();
+        const data = await response.json(); // ✅ FIXED HERE
+        const token = data.token;
+
+        if (!token) {
+          throw new Error("No token received from server");
+        }
+
         localStorage.setItem("token", token);
-
-
         localStorage.setItem("user", username);
+
         if (onLogin) onLogin(username);
+
         navigate("/");
         return;
       }
 
+      // =========================
+      // SIGNUP FLOW
+      // =========================
       const data = await response.json();
       console.log("Signup success:", data);
+
       setIsSignup(false);
+      alert("Account created! Please log in.");
 
     } catch (error) {
       console.error(error);
@@ -94,7 +109,7 @@ export default function Login({ onLogin }) {
           {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
           <span
             className="signup-link"
-            style={{ cursor: "pointer" }}
+            style={{ color: "red", cursor: "pointer" }}
             onClick={() => setIsSignup(!isSignup)}
           >
             {isSignup ? "Login" : "Sign up"}

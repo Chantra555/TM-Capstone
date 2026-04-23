@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function TripOverview() {
-  const { id } = useParams();
+  const { tripId } = useParams(); 
 
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ export default function TripOverview() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`http://localhost:8081/api/trips/${id}`, {
+    fetch(`http://localhost:8081/api/trips/${tripId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,9 +29,8 @@ export default function TripOverview() {
       .finally(() => {
         setLoading(false);
       });
-  }, [id]);
+  }, [tripId]);
 
-  // 🧠 helpers
   function formatDate(dateString) {
     const date = new Date(dateString);
 
@@ -54,7 +53,6 @@ export default function TripOverview() {
     return Math.round(diff) + 1;
   }
 
-  // 🔄 loading state
   if (loading) {
     return (
       <div style={{ padding: "40px" }}>
@@ -63,7 +61,6 @@ export default function TripOverview() {
     );
   }
 
-  // ❌ not found state
   if (!trip) {
     return (
       <div style={{ padding: "40px" }}>
@@ -72,10 +69,8 @@ export default function TripOverview() {
     );
   }
 
-  // ✅ main UI
   return (
     <div className="trip-overview">
-      {/* HEADER */}
       <div className="trip-header">
         <h1>{trip.name}</h1>
 
@@ -84,7 +79,6 @@ export default function TripOverview() {
         </p>
       </div>
 
-      {/* INFO CARDS */}
       <div className="trip-info-grid">
         <div className="info-card">
           <span>Destination</span>

@@ -4,6 +4,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./createTrip.css";
 
+
+/// /CREATE -- form/page to create a new trip
+
 export default function CreateTrip() {
   const navigate = useNavigate();
 

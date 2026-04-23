@@ -1,12 +1,9 @@
-// Nav Bar on left side when inside trip 
-
-
-
 import { useParams, Outlet, NavLink } from "react-router-dom";
 import "./tripLayout.css";
+// NAVBAR on side // 
 
 export default function TripLayout() {
-  const { id } = useParams();
+  const { tripId } = useParams();
 
   return (
     <div className="trip-layout">
@@ -16,25 +13,37 @@ export default function TripLayout() {
         <h2 className="trip-sidebar-title">Trip</h2>
 
         <nav className="trip-nav">
-          <NavLink to={`/trips/${id}`} end className="nav-item">
-            Overview - add Trip Name at Layout.jsx
+
+          <NavLink to={`/trips/${tripId}`} end className="nav-item">
+            Overview
           </NavLink>
 
-          <NavLink to={`/trips/${id}/Itinerary`} className="nav-item">
-            Itinerary -jsx no logic
+          <NavLink to={`/trips/${tripId}/itinerary`} className="nav-item">
+            Itinerary
           </NavLink>
 
-          <NavLink to={`/trips/${id}/settings`} className="nav-item">
-            Settings -nyc
-          </NavLink>
-
-          <NavLink to={`/trips/${id}/Budget`} className="nav-item">
+          <NavLink to={`/trips/${tripId}/budget`} className="nav-item">
             Budget
           </NavLink>
 
-          <NavLink to={`/trips/${id}/settings`} className="nav-item">
-            Documents -nyc
+          <NavLink to={`/trips/${tripId}/documents`} className="nav-item">
+            Documents
           </NavLink>
+
+           <NavLink to={`/trips/${tripId}/lodging`} className="nav-item">
+            Lodging
+          </NavLink>
+
+           <NavLink to={`/trips/${tripId}/transportaion`} className="nav-item">
+            Transportation 
+          </NavLink>
+
+            <NavLink to={`/trips/${tripId}/party`} className="nav-item">
+            Party 
+          </NavLink>
+         
+          
+
 
         </nav>
       </div>

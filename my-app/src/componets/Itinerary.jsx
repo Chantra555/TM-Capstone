@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   DragDropContext,
   Droppable,
@@ -6,17 +7,13 @@ import {
 } from "@hello-pangea/dnd";
 import "./itinerary.css";
 
-export default function ItineraryCalendar() {
-  const [events, setEvents] = useState([
-    {
-      id: "1",
-      title: "Flight to NYC",
-      date: "2026-05-10",
-      time: "08:00",
-      type: "travel",
-      description: "Arrive 2 hours early"
-    }
-  ]);
+export default function Itinerary() {
+  const { tripId } = useParams();
+
+  const [events, setEvents] = useState([]);
+  const [editing, setEditing] = useState(null);
+  const [trip, setTrip] = useState(null);
+
 
   const [form, setForm] = useState({
     title: "",
@@ -27,125 +24,237 @@ export default function ItineraryCalendar() {
     description: ""
   });
 
-  const [editing, setEditing] = useState(null);
+  const token = localStorage.getItem("token");
 
-  /* ================= DATE FORMAT ================= */
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` })
+  };
+
+  /* ================= FETCH ================= */
+  useEffect(() => {
+    if (!tripId) return;
+
+    fetch(`http://localhost:8081/api/itinerary/trip/${tripId}`, {
+      headers
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed fetch");
+        return res.json();
+      })
+      .then((data) => {
+        setEvents(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.error(err));
+  }, [tripId]);
+
+useEffect(() => {
+  if (!tripId) return;
+
+  fetch(`http://localhost:8081/api/trips/${tripId}`, {
+    headers
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch trip");
+      return res.json();
+    })
+    .then((data) => {
+      setTrip(data);
+    })
+    .catch((err) => console.error(err));
+}, [tripId]);
+
+
+  /* ================= FORMAT TIME ================= */
+  const formatTime = (time) => {
+    if (!time) return "";
+    const [h, m] = time.split(":");
+    const hour = parseInt(h);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    return `${hour % 12 || 12}:${m} ${ampm}`;
+  };
+
+  /* ================= FORMAT DATE ================= */
   const formatDate = (dateStr) => {
+    if (!dateStr) return "No date";
+
     const date = new Date(dateStr);
-
-    const dayName = date.toLocaleDateString("en-US", {
-      weekday: "long"
-    });
-
-    const month = date.toLocaleDateString("en-US", {
-      month: "long"
-    });
-
-    const day = date.getDate();
-
-    const getSuffix = (d) => {
-      if (d >= 11 && d <= 13) return "th";
-      switch (d % 10) {
-        case 1: return "st";
-        case 2: return "nd";
-        case 3: return "rd";
-        default: return "th";
-      }
-    };
-
-    return `${dayName}, ${month} ${day}${getSuffix(day)}`;
+    return date.toDateString();
   };
 
   /* ================= ADD EVENT ================= */
   const addEvent = () => {
-    if (!form.title.trim() || !form.date) return;
-
-    const finalType =
-      form.type === "other" && form.customType
-        ? form.customType
-        : form.type;
+    if (!form.title || !form.date) return;
 
     const newEvent = {
-      id: Date.now().toString(),
       title: form.title,
-      date: form.date,
-      time: form.time,
-      type: finalType,
+      eventDate: form.date,
+      eventTime: form.time,
+      type: form.type,
       description: form.description
     };
 
-    setEvents([...events, newEvent]);
+    fetch(`http://localhost:8081/api/itinerary/trip/${tripId}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(newEvent)
+    })
+      .then((res) => res.json())
+      .then((saved) => {
+        setEvents((prev) => [...prev, saved]);
 
-    setForm({
-      title: "",
-      date: "",
-      time: "",
-      type: "activity",
-      customType: "",
-      description: ""
-    });
+        setForm({
+          title: "",
+          date: "",
+          time: "",
+          type: "activity",
+          customType: "",
+          description: ""
+        });
+      })
+      .catch(console.error);
   };
 
   /* ================= EDIT ================= */
   const saveEdit = () => {
-    setEvents(
-      events.map((e) =>
-        e.id === editing.id ? editing : e
-      )
-    );
-    setEditing(null);
+    fetch(`http://localhost:8081/api/itinerary/${editing.id}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(editing)
+    })
+      .then((res) => res.json())
+      .then((updated) => {
+        setEvents((prev) =>
+          prev.map((e) => (e.id === updated.id ? updated : e))
+        );
+        setEditing(null);
+      })
+      .catch(console.error);
   };
 
   /* ================= DRAG ================= */
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
+  const onDragEnd = async (result) => {
+  if (!result.destination) return;
 
-    const { draggableId, destination } = result;
+  const moved = events.find(
+    (e) => e.id?.toString() === result.draggableId
+  );
 
-    setEvents(
-      events.map((event) =>
-        event.id === draggableId
-          ? { ...event, date: destination.droppableId }
-          : event
-      )
-    );
+  if (!moved) return;
+
+  const updated = {
+    title: moved.title,
+    eventDate: result.destination.droppableId,
+    eventTime: moved.eventTime,
+    type: moved.type,
+    description: moved.description
   };
 
-  /* ================= GROUP ================= */
-  const grouped = events.reduce((acc, event) => {
-    if (!acc[event.date]) acc[event.date] = [];
-    acc[event.date].push(event);
+  // optimistic UI update
+  setEvents((prev) =>
+    prev.map((e) =>
+      e.id === moved.id ? { ...moved, eventDate: updated.eventDate } : e
+    )
+  );
+
+  try {
+    const res = await fetch(
+      `http://localhost:8081/api/itinerary/${moved.id}`,
+      {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(updated)
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+
+    const saved = await res.json();
+
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === saved.id ? saved : e
+      )
+    );
+
+  } catch (err) {
+    console.error("Drag save failed:", err);
+  }
+};
+
+
+  const deleteEvent = async (id) => {
+  try {
+    const res = await fetch(
+      `http://localhost:8081/api/itinerary/${id}`,
+      {
+        method: "DELETE",
+        headers
+      }
+    );
+
+    console.log("DELETE status:", res.status);
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("DELETE failed:", text);
+      return;
+    }
+
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+    setEditing(null);
+  } catch (err) {
+    console.error("DELETE error:", err);
+  }
+};
+
+
+
+  /* ================= GROUP EVENTS ================= */
+  const grouped = (events || []).reduce((acc, e) => {
+    const key = e.eventDate || "Unknown";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(e);
     return acc;
   }, {});
 
-  Object.keys(grouped).forEach((date) => {
-    grouped[date].sort((a, b) =>
-      (a.time || "").localeCompare(b.time || "")
+  Object.keys(grouped).forEach((key) => {
+    grouped[key].sort((a, b) =>
+      (a.eventTime || "").localeCompare(b.eventTime || "")
     );
   });
 
   const sortedDates = Object.keys(grouped).sort();
 
-  // am/pm vs millitary 
-
-  const formatTime = (time) => {
-  if (!time) return "";
-
-  const [hour, minute] = time.split(":");
-  let h = parseInt(hour);
-  const ampm = h >= 12 ? "PM" : "AM";
-
-  h = h % 12 || 12; // convert 0 → 12
-
-  return `${h}:${minute} ${ampm}`;
-};
-
-
   return (
     <div className="calendar-container">
       <h1>Trip Calendar</h1>
+          {trip && (
+        <p className="trip-dates">
+          {trip.startDate &&
+            new Date(trip.startDate).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
 
-      {/* ================= FORM ================= */}
+          {" → "}
+
+          {trip.endDate &&
+            new Date(trip.endDate).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+        </p>
+      )}
+
+
+      {/* FORM */}
       <div className="form">
         <input
           placeholder="Event title"
@@ -170,7 +279,7 @@ export default function ItineraryCalendar() {
             setForm({ ...form, time: e.target.value })
           }
         />
-        <div className="choice">
+ <div className="choice">
         <select
          className="test"
         
@@ -184,85 +293,21 @@ export default function ItineraryCalendar() {
           <option value="travel">Travel</option>
           <option value="hotel">Hotel</option>
           <option value="other">Other</option>
-        </select>
+         </select>
           </div>
-
           
-        {form.type === "other" && (
-          <input
-            placeholder="Custom type..."
-            value={form.customType}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                customType: e.target.value
-              })
-            }
-          />
-        )}
-
-        {/* 🆕 DESCRIPTION FIELD */}
         <textarea
-          placeholder="Notes / description..."
+          placeholder="Notes"
           value={form.description}
           onChange={(e) =>
-            setForm({
-              ...form,
-              description: e.target.value
-            })
+            setForm({ ...form, description: e.target.value })
           }
         />
 
         <button onClick={addEvent}>Add Event</button>
       </div>
 
-      {/* ================= EDIT MODAL ================= */}
-      {editing && (
-  <>
-    <div className="modal-overlay" onClick={() => setEditing(null)} />
-
-    <div className="modal">
-      <h3>Edit Event</h3>
-
-      <input
-        value={editing.title}
-        onChange={(e) =>
-          setEditing({
-            ...editing,
-            title: e.target.value
-          })
-        }
-      />
-
-      <input
-        type="time"
-        value={editing.time}
-        onChange={(e) =>
-          setEditing({
-            ...editing,
-            time: e.target.value
-          })
-        }
-      />
-
-      <textarea
-        value={editing.description || ""}
-        onChange={(e) =>
-          setEditing({
-            ...editing,
-            description: e.target.value
-          })
-        }
-      />
-
-      <button className="save-btn" onClick={saveEdit}>Save</button>
-      <button className="cancel-btn" onClick={() => setEditing(null)}>Cancel</button>
-    </div>
-  </>
-)}
-
-
-      {/* ================= CALENDAR ================= */}
+      {/* CALENDAR */}
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="calendar">
           {sortedDates.map((date) => (
@@ -278,7 +323,7 @@ export default function ItineraryCalendar() {
                   {grouped[date].map((event, index) => (
                     <Draggable
                       key={event.id}
-                      draggableId={event.id}
+                      draggableId={event.id.toString()}
                       index={index}
                     >
                       {(provided) => (
@@ -291,15 +336,10 @@ export default function ItineraryCalendar() {
                         >
                           <strong>{event.title}</strong>
 
-                          {event.time && (
-                            <div>🕒 {formatTime(event.time)}</div>
-                          )}
-
-                          {/* 🆕 SHOW DESCRIPTION */}
-                          {event.description && (
-                            <p className="desc">
-                              {event.description}
-                            </p>
+                          {event.eventTime && (
+                            <div>
+                              🕒 {formatTime(event.eventTime)}
+                            </div>
                           )}
 
                           <small>{event.type}</small>
@@ -315,6 +355,78 @@ export default function ItineraryCalendar() {
           ))}
         </div>
       </DragDropContext>
+
+      {/* MODAL */}
+      {editing && (
+        <>
+          <div
+            className="modal-overlay"
+            onClick={() => setEditing(null)}
+          />
+
+          <div className="modal">
+            <h3>Edit Event</h3>
+
+            <input
+              value={editing.title || ""}
+              onChange={(e) =>
+                setEditing({
+                  ...editing,
+                  title: e.target.value
+                })
+              }
+            />
+
+            <input
+              type="time"
+              value={editing.eventTime || ""}
+              onChange={(e) =>
+                setEditing({
+                  ...editing,
+                  eventTime: e.target.value
+                })
+              }
+            />
+
+            <textarea
+              value={editing.description || ""}
+              onChange={(e) =>
+                setEditing({
+                  ...editing,
+                  description: e.target.value
+                })
+              }
+            />
+
+            <button className="save-btn" onClick={saveEdit}>
+              Save
+            </button>
+
+            <button
+              className="cancel-btn"
+              onClick={() => setEditing(null)}
+            >
+              Cancel
+            </button>
+                <button
+                style={{
+                  marginTop: "10px",
+                  width: "100%",
+                  background: "darkred",
+                  color: "white",
+                  padding: "8px",
+                  borderRadius: "8px",
+                  border: "none",
+                  cursor: "pointer"
+                }}
+                onClick={() => deleteEvent(editing.id)}
+              >
+                Delete Event
+              </button>
+
+          </div>
+        </>
+      )}
     </div>
   );
 }

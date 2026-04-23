@@ -1,20 +1,22 @@
 import ReactDOM from "react-dom/client";
 import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Navbar from "./componets/Navbar.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import CreateTrip from "./pages/CreateTrip.jsx";
 import Trips from "./componets/Trips.jsx";
 import Login from "./pages/Login.jsx";
-import "./style.css";
-import Budget from "./componets/Budget.jsx"
-import TripDetail from "./componets/TripDetail.jsx";
+import Budget from "./componets/Budget.jsx";
 import TripLayout from "./componets/TripLayout.jsx";
 import TripOverview from "./componets/TripOverview.jsx";
 import Itinerary from "./componets/Itinerary.jsx";
+import Documents from "./componets/Documents.jsx";
+import Party from "./componets/Party.jsx";
+import Lodging from "./componets/Lodging.jsx";
+import "./style.css";
 
 function App() {
-  // use null as initial state safely
   const [user, setUser] = useState(() => {
     try {
       return localStorage.getItem("user") || null;
@@ -32,20 +34,23 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar user={user} onLogout={handleLogout} />
+
       <Routes>
+        {/* MAIN PAGES */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/create" element={<CreateTrip />} />
-          <Route path="/trips" element={<Trips />} />
+        <Route path="/trips" element={<Trips />} />
         <Route path="/login" element={<Login onLogin={setUser} />} />
-        <Route path="/trips/:id" element={<TripDetail />} />
 
-        <Route path="/trips/:id" element={<TripLayout />}>
-        <Route index element={<TripOverview />} />
-        <Route path="Itinerary" element={<Itinerary/>} />
-        <Route path="budget" element={<Budget />} />
-        {/* <Route path="settings" element={<div>Settings</div>} /> */}
-      </Route>
-
+        {/* TRIP LAYOUT (NESTED ROUTES) */}
+        <Route path="/trips/:tripId" element={<TripLayout />}>
+          <Route index element={<TripOverview />} />
+          <Route path="itinerary" element={<Itinerary />} />
+          <Route path="budget" element={<Budget />} />
+          <Route path ="documents" element={<Documents />} />
+          <Route path ="party" element={<Party />} />
+          <Route path ="lodging" element={<Lodging />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

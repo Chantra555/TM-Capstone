@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+
+
 export default function CreateTrip() {
   const [trip, setTrip] = useState({
     name: "",

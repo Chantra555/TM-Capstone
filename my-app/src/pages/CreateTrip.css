@@ -6,7 +6,8 @@
   justify-content: flex-start; /* 👈 important */
   padding: 3rem 1rem; /* better spacing top/bottom */
   min-height: 100vh;
-  background: #f5f3ef;
+ 
+
 }
 
 /* + New Trip card */
@@ -22,11 +23,13 @@
   color: #1a1a18;
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
   transition: transform 0.3s, box-shadow 0.3s;
+  background: linear-gradient(to top, #ff9966, #ff5e62, #1e3c72);
 }
 
 .new-trip-card:hover {
   transform: scale(1.05);
   box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  
 }
 
 /* form box */
@@ -37,7 +40,8 @@
   width: 100%;
   max-width: 380px;
   max-height: 90vh;
-  background: #fff;
+ background: linear-gradient(to top, #ff9966, #ff5e62, #1e3c72);
+
   box-shadow: 0 12px 24px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
@@ -45,6 +49,13 @@
   position: relative;
   transform: scale(0.95);
   transform-origin: top center;
+  
+
+
+}
+
+.trip-form-card placeholder{
+  color: #000;
 
 }
 
@@ -52,8 +63,9 @@
 .trip-form-card input {
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid #e0ddd6;
+  border: 1px solid #cd9718;
   outline: none;
+  color:#ececec;
 }
 
 /* button */

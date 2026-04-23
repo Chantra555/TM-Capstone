@@ -4,55 +4,83 @@ import com.muro.dto.LoginRequest;
 import com.muro.dto.UserRequest;
 import com.muro.dto.UserResponse;
 import com.muro.entity.User;
-import com.muro.service.UserService;
 import com.muro.security.JwtUtil;
+import com.muro.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173") // your frontend port
 public class AuthController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
-    /**
-     * Sign up a new user
-     */
+    // =========================
+    // SIGNUP
+    // =========================
     @PostMapping("/signup")
     public UserResponse signup(@RequestBody UserRequest request) {
         try {
-            User user = userService.signup(request.getName(), request.getUsername(), request.getPassword());
-            return new UserResponse(user.getId(), user.getUsername(), user.getName());
+            User user = userService.signup(
+                    request.getName(),
+                    request.getUsername(),
+                    request.getPassword()
+            );
+
+            return new UserResponse(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getName()
+            );
+
         } catch (IllegalArgumentException e) {
-            // For example, username already exists
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
-    /**
-     * Login existing user
-     */
+    // =========================
+    // LOGIN
+    // =========================
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@RequestBody LoginRequest request) {
         try {
-            User user = userService.login(request.getUsername(), request.getPassword());
+            User user = userService.login(
+                    request.getUsername(),
+                    request.getPassword()
+            );
 
-            return JwtUtil.generateToken(user.getUsername());
+            String token = jwtUtil.generateToken(user.getUsername());
+
+            return new LoginResponse(token);
 
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+    }
+
+    // =========================
+    // RESPONSE WRAPPER (IMPORTANT)
+    // =========================
+    public static class LoginResponse {
+        private String token;
+
+        public LoginResponse(String token) {
+            this.token = token;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
         }
     }
 }

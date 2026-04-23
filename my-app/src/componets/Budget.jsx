@@ -1,271 +1,297 @@
-
-import "./Budget.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import "./budget.css";
 
 export default function Budget() {
-  const [editMode, setEditMode] = useState(false);
+  const { tripId } = useParams();
 
-  // 💳 expenses always exist
-  const [expenses, setExpenses] = useState([
-    { name: "Flights", amount: 500 },
-    { name: "Hotel", amount: 300 },
-    { name: "Food", amount: 120 },
-    { name: "Activities", amount: 100 },
-  ]);
+  const [budget, setBudget] = useState(null);
+  const [expenses, setExpenses] = useState([]);
 
-  // 💰 optional budget
-  const [budgetTotal, setBudgetTotal] = useState(null);
-
-  // ➕ input for creating budget
   const [newBudget, setNewBudget] = useState("");
+  const [newExpense, setNewExpense] = useState({
+    name: "",
+    amount: "",
+  });
 
-  // 🧠 calculations
-  const spent = expenses.reduce(
-    (sum, item) => sum + Number(item.amount || 0),
-    0
-  );
+  const [editingIndex, setEditingIndex] = useState(null);
 
-  const remaining = budgetTotal ? budgetTotal - spent : null;
-  const hasBudget = budgetTotal && budgetTotal > 0;
+  /* ================= JWT FETCH ================= */
 
-  // ✏️ update budget total (edit mode)
-  const handleBudgetChange = (e) => {
-    setBudgetTotal(Number(e.target.value));
+  const apiFetch = async (url, options = {}) => {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+        ...options.headers,
+      },
+    });
+
+    return res;
   };
 
-  // ✏️ update expense
-  const handleExpenseChange = (index, value) => {
-    const updated = [...expenses];
-    updated[index].amount = Number(value);
-    setExpenses(updated);
+  /* ================= LOAD DATA ================= */
+
+  useEffect(() => {
+    if (tripId) {
+      fetchBudget();
+      fetchExpenses();
+    }
+  }, [tripId]);
+
+  const fetchBudget = async () => {
+    try {
+      const res = await apiFetch(
+        `http://localhost:8081/api/budget/trip/${tripId}`
+      );
+
+      if (!res.ok) {
+        setBudget(null);
+        return;
+      }
+
+      const data = await res.json();
+      setBudget(data);
+    } catch (err) {
+      console.error("Budget load failed:", err);
+    }
   };
 
-  // ➕ create budget
-  const handleCreateBudget = () => {
-    if (!newBudget) {
-      alert("Must add in an amount");
-    
-      return;
+  const fetchExpenses = async () => {
+    try {
+      const res = await apiFetch(
+        `http://localhost:8081/api/expense/trip/${tripId}`
+      );
+
+      if (!res.ok) {
+        setExpenses([]);
+        return;
+      }
+
+      const data = await res.json();
+      setExpenses(data || []);
+    } catch (err) {
+      console.error("Expense load failed:", err);
+    }
+  };
+
+  /* ================= CALCULATIONS ================= */
+
+  const spent = expenses.reduce((sum, e) => sum + (e.cost || 0), 0);
+
+  const remaining = budget?.idealBudget
+    ? budget.idealBudget - spent
+    : null;
+
+  const hasBudget = budget !== null;
+
+  /* ================= BUDGET ================= */
+
+  const handleCreateBudget = async () => {
+    if (!newBudget) return alert("Enter budget");
+
+    await apiFetch(`http://localhost:8081/api/budget/${tripId}`, {
+      method: "POST",
+      body: JSON.stringify({
+        idealBudget: Number(newBudget),
+      }),
+    });
+
+    setNewBudget("");
+    fetchBudget();
+  };
+
+  /* ================= EXPENSES ================= */
+
+  const handleAddExpense = async () => {
+    if (!newExpense.name || !newExpense.amount) {
+      return alert("Fill both fields");
     }
 
-    
+    await apiFetch("http://localhost:8081/api/expense", {
+      method: "POST",
+      body: JSON.stringify({
+        name: newExpense.name,
+        cost: Number(newExpense.amount),
+        tripId: Number(tripId),
+      }),
+    });
 
-    setBudgetTotal(Number(newBudget));
-    setNewBudget("");
+    setNewExpense({ name: "", amount: "" });
+    fetchExpenses();
   };
-  const handleRemoveBudget = () => {
-  setBudgetTotal(null);
-  setEditMode(false);
-};
-const [newExpense, setNewExpense] = useState({
-  name: "",
-  amount: "",
-});
-const handleAddExpense = () => {
-  if (!newExpense.name && !newExpense.amount){
-    alert("Both feilds must be filled")
-    return;
-  }
 
-  setExpenses([
-    ...expenses,
-    {
-      name: newExpense.name,
-      amount: Number(newExpense.amount),
-    },
-  ]);
+  const handleDeleteExpense = async (id) => {
+    await apiFetch(`http://localhost:8081/api/expense/${id}`, {
+      method: "DELETE",
+    });
 
-  setNewExpense({ name: "", amount: "" });
-};
+    fetchExpenses();
+  };
+
+  const handleUpdateExpense = async (exp) => {
+    await apiFetch(`http://localhost:8081/api/expense/${exp.id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        name: exp.name,
+        cost: exp.cost,
+        tripId: Number(tripId),
+      }),
+    });
+
+    setEditingIndex(null);
+    fetchExpenses();
+  };
+
+  /* ================= UI ================= */
 
   return (
     <div className="budget-page">
 
       {/* HEADER */}
       <div className="budget-header">
-  <h1>Expenses</h1>
+        <h1>Budget & Expenses</h1>
+      </div>
 
-  <div style={{ display: "flex", gap: "10px" }}>
-    {hasBudget && (
-      <>
-        <button onClick={() => setEditMode(!editMode)}>
-          {editMode ? "Done" : "Edit"}
-        </button>
+      {/* SUMMARY */}
+      <div className="summary-grid">
+        <div className="card">
+          <p>Total Spent</p>
+          <h2>${spent}</h2>
+        </div>
 
-        <button
-          onClick={handleRemoveBudget}
-          style={{ background: "#dc2626" }}
-        >
-          Remove Budget
-        </button>
-      </>
-    )}
-  </div>
-</div>
-
-
-      {/* =========================
-          HAS BUDGET VIEW
-      ========================= */}
-      {hasBudget ? (
-        <>
-          {/* TOP CARDS */}
-          <div className="budget-grid">
-            <div className="budget-card">
-              <span>Total Budget</span>
-
-              {editMode ? (
-                <input
-                  type="number"
-                  value={budgetTotal}
-                  onChange={handleBudgetChange}
-                />
-              ) : (
-                <h2>${budgetTotal}</h2>
-              )}
+        {hasBudget && (
+          <>
+            <div className="card">
+              <p>Total Budget</p>
+              <h2>${budget.idealBudget}</h2>
             </div>
 
-            <div className="budget-card">
-              <span>Spent</span>
-              <h2>${spent}</h2>
-            </div>
-
-            <div className={`budget-card ${remaining < 0 ? "danger" : "good"}`}>
-              <span>Remaining</span>
+            <div className={`card ${remaining < 0 ? "negative" : "positive"}`}>
+              <p>Remaining</p>
               <h2>${remaining}</h2>
             </div>
-          </div>
+          </>
+        )}
+      </div>
 
-          {/* EXPENSES */}
-          <h2 className="section-title">Expense</h2>
+      {/* EXPENSES */}
+      <div className="expenses">
+        <h2>Expenses</h2>
 
-          <div className="budget-list">
-            {expenses.map((exp, index) => (
-              <div key={index} className="budget-row">
-                <span>{exp.name}</span>
+        {expenses.length === 0 && (
+          <p className="empty">No expenses yet</p>
+        )}
 
-                {editMode ? (
+        {expenses.map((exp, index) => {
+          const isEditing = editingIndex === index;
+
+          return (
+            <div key={exp.id || index} className="expense-row">
+
+              {isEditing ? (
+                <>
+                  <input
+                    value={exp.name}
+                    onChange={(e) => {
+                      const updated = [...expenses];
+                      updated[index] = {
+                        ...updated[index],
+                        name: e.target.value,
+                      };
+                      setExpenses(updated);
+                    }}
+                  />
+
                   <input
                     type="number"
-                    value={exp.amount}
-                    onChange={(e) =>
-                      handleExpenseChange(index, e.target.value)
-                    }
+                    value={exp.cost}
+                    onChange={(e) => {
+                      const updated = [...expenses];
+                      updated[index] = {
+                        ...updated[index],
+                        cost: Number(e.target.value),
+                      };
+                      setExpenses(updated);
+                    }}
                   />
-                ) : (
-                  <span>${exp.amount}</span>
-                )}
-              </div>
-            ))}
-          </div>
 
-          {/* 🧮 MATH FOOTER */}
-          <div className="budget-footer">
-            <div className="math-line">
-              <span>Total Spent</span>
-              <span>${spent}</span>
+                  <button onClick={() => handleUpdateExpense(exp)}>
+                    Save
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span>{exp.name}</span>
+                  <span className="amount">${exp.cost}</span>
+
+                  <div className="row-actions">
+                    <button onClick={() => setEditingIndex(index)}>
+                      Edit
+                    </button>
+
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDeleteExpense(exp.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
+
             </div>
+          );
+        })}
+      </div>
 
-            <div className="math-line">
-              <span>Total Budget</span>
-              <span>${budgetTotal}</span>
-            </div>
+      {/* ADD EXPENSE */}
+      <div className="card">
+        <h3>Add Expense</h3>
 
-            <div className="math-line">
-              <span>- Spent</span>
-              <span>-${spent}</span>
-            </div>
+        <input
+          placeholder="Expense name"
+          value={newExpense.name}
+          onChange={(e) =>
+            setNewExpense({ ...newExpense, name: e.target.value })
+          }
+        />
 
-            <div className="math-line result">
-              <span>= Remaining</span>
-              <span>${remaining}</span>
-            </div>
-          </div>
-        </>
-      ) : (
-        /* =========================
-           NO BUDGET VIEW
-        ========================= */
-        <>
-          {/* SUMMARY CARD */}
-          <div className="budget-card">
-            <span>Total Spent</span>
-            <h2>${spent}</h2>
-          </div>
+        <input
+          type="number"
+          placeholder="Amount"
+          value={newExpense.amount}
+          onChange={(e) =>
+            setNewExpense({ ...newExpense, amount: e.target.value })
+          }
+        />
 
-          {/* EXPENSES */}
-          <h2 className="section-title">Expenses</h2>
+        <button onClick={handleAddExpense}>
+          Add Expense
+        </button>
+      </div>
 
-          <div className="budget-list">
-            {expenses.map((exp, index) => (
-              <div key={index} className="budget-row">
-                <span>{exp.name}</span>
+      {/* CREATE BUDGET */}
+      {!hasBudget && (
+        <div className="card">
+          <h3>Create Budget</h3>
 
-                {editMode ? (
-                  <input
-                    type="number"
-                    value={exp.amount}
-                    onChange={(e) =>
-                      handleExpenseChange(index, e.target.value)
-                    }
-                  />
-                ) : (
-                  <span>${exp.amount}</span>
-                )}
-                
-              </div>
-              
-            ))}
+          <input
+            type="number"
+            placeholder="Enter budget"
+            value={newBudget}
+            onChange={(e) => setNewBudget(e.target.value)}
+          />
 
-            <div className="math-line">
-              <span>Total Spent</span>
-              <span>${spent}</span>
-            </div>
-
-          </div>
-
-          {/* ➕ CREATE BUDGET */}
-          <div className="budget-create">
-            <h3>Add a Budget</h3>
-
-            <input
-              type="number"
-              placeholder="Enter budget amount"
-              value={newBudget}
-              onChange={(e) => setNewBudget(e.target.value)}
-            />
-
-            <button onClick={handleCreateBudget}>
-              Set Budget
-            </button>
-          </div>
-          {/* ➕ ADD EXPENSE */}
-<div className="budget-add-expense">
-  <h3>➕ Add Expense</h3>
-
-  <input
-    type="text"
-    placeholder="Expense name"
-    value={newExpense.name}
-    onChange={(e) =>
-      setNewExpense({ ...newExpense, name: e.target.value })
-    }
-  />
-
-  <input
-    type="number"
-    placeholder="Amount"
-    value={newExpense.amount}
-    onChange={(e) =>
-      setNewExpense({ ...newExpense, amount: e.target.value })
-    }
-  />
-
-  <button onClick={handleAddExpense}>Add</button>
-</div>
-        </>
+          <button onClick={handleCreateBudget}>
+            Set Budget
+          </button>
+        </div>
       )}
+
     </div>
-    
   );
 }

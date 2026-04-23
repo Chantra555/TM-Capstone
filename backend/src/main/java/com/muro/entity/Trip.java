@@ -75,6 +75,10 @@ public class Trip {
     @JoinColumn(name = "user_id") // this matches your SQL column
     private User user;
 
+    @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL)
+    private Budget budget;
+
+
     public User getUser() {
         return user;
     }

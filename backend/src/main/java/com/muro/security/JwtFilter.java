@@ -1,19 +1,30 @@
 package com.muro.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
+
+    public JwtFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -23,33 +34,50 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
-        if (header != null && header.startsWith("Bearer ")) {
+        // No token → continue normally
+        if (header == null || !header.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            try {
-                String token = header.substring(7);
+        String token = header.substring(7);
+        String username;
 
-                String username = JwtUtil.extractUsername(token);
+        try {
+            // 🔥 THIS is where SignatureException can happen
+            username = jwtUtil.extractUsername(token);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        } catch (JwtException e) {
+            // ❌ Invalid token → clear context and reject cleanly
+            SecurityContextHolder.clearContext();
 
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    username,
-                                    null,
-                                    List.of() // MUST NOT be null
-                            );
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid or expired JWT token");
+            return;
+        }
 
-                    auth.setDetails(
-                            new org.springframework.security.web.authentication.WebAuthenticationDetailsSource()
-                                    .buildDetails(request)
-                    );
+        // Already authenticated → skip
+        if (username != null &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
+            UserDetails userDetails =
+                    userDetailsService.loadUserByUsername(username);
 
-            } catch (Exception e) {
-                // IMPORTANT: clear context on failure
-                SecurityContextHolder.clearContext();
+            if (jwtUtil.isTokenValid(token, userDetails)) {
+
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                auth.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
 

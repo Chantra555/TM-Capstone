@@ -4,8 +4,6 @@
   font-family: "Inter", "Segoe UI", sans-serif;
   min-height: 100vh;
   color: #f5f5f5;
-
-  /* background: radial-gradient(circle at top, #1a1a1a, #0f0f0f); */
 }
 
 /* ===== TITLE ===== */
@@ -19,48 +17,60 @@ h1 {
 /* ===== FORM ===== */
 .form {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 10px;
+
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
 
   margin-bottom: 20px;
-  padding: 12px;
+  padding: 14px;
 
-  background: rgba(0, 0, 0, 0.406);
+  background: rgba(0, 0, 0, 0.795);
   border-radius: 12px;
-  border: 1px solid rgb(255, 217, 0);
+  border: 1.5px solid rgb(255, 217, 0);
 }
 
-
-.choice .test{
-  background-color:  rgba(13, 5, 5, 0.715);
-}
-/* ===== INPUTS ===== */
+/* unified input sizing */
 .form input,
 .form select,
 .form textarea {
-  padding: 6px 6px;
-  font-size: 12px;
+  font-size: 13px;
+  padding: 8px 10px;
 
   background: rgba(255, 255, 255, 0.06);
-  border: 1.2px solid rgba(255, 215, 0, 0.2);
+  border: 2px solid rgba(255, 215, 0, 0.2);
   border-radius: 6px;
-  
-  color: #f5f5f5;
-  height: 32px;
 
+  color: #f5f5f5;
   outline: none;
+
+  min-width: 160px;
+  flex: 1;
 }
 
+/* fix time/date height mismatch */
+.form input[type="date"],
+.form input[type="time"] {
+  height: 36px;
+}
+
+/* textarea fix */
 .form textarea {
+  min-width: 220px;
+  height: 36px;
   resize: none;
-  width: 180px;
+}
+
+/* dropdown fix */
+.choice .test {
+  background-color: rgba(13, 5, 5, 0.715);
+  height: 36px;
 }
 
 /* ===== BUTTON ===== */
 .form button {
-  padding: 6px 12px;
+  padding: 8px 14px;
   font-size: 13px;
 
   background: linear-gradient(135deg, #d4af37, #f5d76e);
@@ -69,6 +79,9 @@ h1 {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+
+  height: 36px;
+  align-self: stretch;
 }
 
 /* ===== CALENDAR ===== */
@@ -77,72 +90,65 @@ h1 {
   gap: 18px;
   overflow-x: auto;
   padding-bottom: 20px;
+  
 }
 
 /* ===== DAY COLUMN ===== */
 .day-column {
-  min-width: 260px;
+  min-width: 280px;
+  flex: 0 0 280px;
+
   padding: 14px;
 
   border-radius: 16px;
+  background: rgba(58, 50, 50, 0.05);
+  border: 1px solid rgba(222, 195, 44, 0.729);
 
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 215, 0, 0.15);
-
-  /* IMPORTANT: prevents stacking issues */
   position: relative;
-  z-index: 1;
 }
 
 /* ===== DATE HEADER ===== */
 .day-column h3 {
   text-align: center;
-  font-size: 14px;
+  font-size: 17px;
   margin-bottom: 12px;
-  color: #d4af37;
+  color: #d6a917;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 /* ===== EVENT CARD ===== */
 .event-card {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.54);
 
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 10px;
 
   border-radius: 10px;
 
-  border-left: 4px solid #d4af37;
-font-family: Georgia, 'Times New Roman', Times, serif;
+  border-left: 4.5px solid #d4af37;
+  font-family: Georgia, Times, serif;
+
   cursor: grab;
 }
 
-/* ===== TEXT ===== */
+/* FIX text contrast (you had black on dark bg issue) */
 .event-card strong {
   display: block;
   font-size: 14px;
   margin-bottom: 4px;
-  color: rgb(0, 0, 0);
-  
-}
-
-.event-card div {
-  font-size: 12px;
   color: #000000;
-  font-family:'Times New Roman', Times, serif;
 }
 
-.event-card small {
-  font-size: 11px;
-  color: #000000;
-  margin-top: 4px;
-  display: block;
-}
-
-/* ===== DESCRIPTION ===== */
+.event-card div,
+.event-card small,
 .desc {
-  font-size: 12px;
-  margin-top: 6px;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
+  font-size: 13px;
   color: #000000;
+}
+
+.desc {
+  margin-top: 6px;
   line-height: 1.4;
 }
 
@@ -151,11 +157,10 @@ font-family: Georgia, 'Times New Roman', Times, serif;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
-
   z-index: 9998;
 }
 
-/* ===== MODAL (FIXED STACKING) ===== */
+/* ===== MODAL ===== */
 .modal {
   position: fixed;
   top: 50%;
@@ -164,24 +169,22 @@ font-family: Georgia, 'Times New Roman', Times, serif;
 
   z-index: 9999;
 
-  width: 320px;
+  width: 340px;
   max-width: 90%;
 
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.92);
   border: 1px solid rgba(255, 215, 0, 0.2);
 
   border-radius: 14px;
   padding: 20px;
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
 
-/* ===== MODAL INPUTS ===== */
+/* modal inputs */
 .modal input,
 .modal textarea {
   width: 100%;
   margin-bottom: 10px;
-  padding: 8px;
+  padding: 10px;
 
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 215, 0, 0.2);
@@ -190,7 +193,34 @@ font-family: Georgia, 'Times New Roman', Times, serif;
   border-radius: 8px;
 }
 
-/* ===== SCROLLBAR ===== */
+/* ===== BUTTON ROW FIX ===== */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.modal button {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* SAVE */
+.save-btn {
+  background: linear-gradient(135deg, #d4af37, #f5d76e);
+  color: #111;
+}
+
+/* CANCEL */
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f5f5f5;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/* SCROLLBAR */
 .calendar::-webkit-scrollbar {
   height: 8px;
 }
@@ -199,51 +229,13 @@ font-family: Georgia, 'Times New Roman', Times, serif;
   background: rgba(255, 215, 0, 0.3);
   border-radius: 10px;
 }
-/* ===== MODAL BUTTON ROW ===== */
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
+
+.choice .test{
+  background-color:  rgba(13, 5, 5, 0.715);
 }
-
-/* ===== BASE BUTTON STYLE ===== */
-.modal button {
-  flex: 1;
-  padding: 8px 10px;
-
-  border-radius: 8px;
-  border: 1px solid transparent;
-
-  font-size: 13px;
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-}
-
-/* ===== SAVE BUTTON (GOLD PRIMARY) ===== */
-.save-btn {
-  background: linear-gradient(135deg, #d4af37, #f5d76e);
-  color: #111;
-
-  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.25);
-  padding-right: 20px;
-}
-
-.save-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.4);
-}
-
-/* ===== CANCEL BUTTON (SUBTLE DARK) ===== */
-.cancel-btn {
-  background: rgba(255, 255, 255, 0.06);
-  color: #f5f5f5;
-
-  border: 1px solid rgba(255, 215, 0, 0.2);
-}
-
-.cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 215, 0, 0.4);
+.trip-dates{
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 500;
+ 
 }

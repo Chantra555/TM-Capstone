@@ -19,47 +19,142 @@ export default function Trips() {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then((res) => res.json())
-      .then((data) => setTrips(Array.isArray(data) ? data : []))
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch trips");
+        return res.json();
+      })
+      .then((data) => {
+        setTrips(Array.isArray(data) ? data : []);
+      })
       .catch((err) => console.error(err));
   }, [token, navigate]);
 
-  return (
-    <div className="trips-page">
-      <h2 className="trips-title">Your Trips</h2>
+  // ✅ DELETE FUNCTION
+const handleDelete = (tripId) => {
+  if (!window.confirm("Delete this trip?")) return;
 
-      {trips.length === 0 ? (
-        <p className="empty-text">No trips found.</p>
-      ) : (
-        <div className="trips-grid">
-          {trips.map((trip) => (
-            <div
-              key={trip.id}
-              className="trip-card"
-              onClick={() => navigate(`/trips/${trip.id}`)}
-            >
-              <h3 className="trip-name">{trip.name}</h3>
+  console.log("DELETE TOKEN:", token);
 
-             <p className="trip-dates">
-                {new Date(trip.startDate).toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            })}
-            {" → "}
-            {new Date(trip.endDate).toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            })}
-            </p>
+  fetch(`http://localhost:8081/api/trips/${tripId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => {
+      if (!res.ok) {
+        return res.text().then((text) => {
+          throw new Error(text || "Delete failed");
+        });
+      }
 
+      setTrips((prev) =>
+        prev.filter((t) => (t.id ?? t.tripId) !== tripId)
+      );
+    })
+    .catch((err) => console.error("DELETE ERROR:", err.message));
+};
+
+
+  // ✅ SPLIT TRIPS
+const today = new Date();
+today.setHours(0, 0, 0, 0); // normalize to start of day
+
+const normalizeDate = (dateStr) => {
+  const d = new Date(dateStr);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const currentTrips = trips.filter((trip) => {
+  if (!trip.endDate) return false;
+  return normalizeDate(trip.endDate) >= today;
+});
+
+const pastTrips = trips.filter((trip) => {
+  if (!trip.endDate) return false;
+  return normalizeDate(trip.endDate) < today;
+});
+
+
+
+  // ✅ CARD RENDER
+  const renderTrips = (tripList) => {
+    if (tripList.length === 0) {
+      return <p className="empty-text">No trips found.</p>;
+    }
+
+    return (
+      <div className="trips-grid">
+        {tripList.map((trip) => {
+          const tripId = trip.id ?? trip.tripId;
+
+          return (
+            <div key={tripId} className="trip-card">
+              <div
+                className="trip-click"
+                onClick={() => navigate(`/trips/${tripId}`)}
+              >
+                <h3 className="trip-name">{trip.name}</h3>
+                  <p className="trip-dates">
+                    {trip.startDate &&
+                      new Date(trip.startDate).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+
+                    {" → "}
+
+                    {trip.endDate &&
+                      new Date(trip.endDate).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                  </p>
+
+              </div>
+
+              {/* ✅ DELETE BUTTON */}
+              <button
+                className="delete-btn"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevents card click
+                  handleDelete(tripId);
+                }}
+              >
+                Delete
+              </button>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+  <div className="trips-page">
+    <h2 className="trips-title">Your Trips</h2>
+
+    {/* CURRENT TRIPS */}
+    {currentTrips.length === 0 ? (
+      <p className="empty-text">No active trips.</p>
+    ) : (
+      renderTrips(currentTrips)
+    )}
+
+    {/* PAST TRIPS */}
+    {pastTrips.length > 0 && (
+      <>
+        <h3 className="section-title past">Past Trips</h3>
+        {renderTrips(pastTrips)}
+      </>
+    )}
+  </div>
+);
+
 }

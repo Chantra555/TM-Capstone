@@ -1,0 +1,106 @@
+.party-page {
+  max-width: 700px;
+  margin: auto;
+  padding: 24px;
+  font-family: "Inter", sans-serif;
+  color: white;
+}
+
+.title {
+  margin-bottom: 20px;
+}
+
+/* ADD BAR */
+.add-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.add-row input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.add-row button {
+  padding: 12px 18px;
+  background: #4cafef;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  color: white;
+  transition: 0.2s;
+}
+
+.add-row button:hover {
+  background: #3a9edc;
+}
+
+/* LIST */
+.party-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* CARD */
+.party-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1a1a1a;
+  padding: 14px 16px;
+  border-radius: 12px;
+  transition: 0.2s;
+}
+
+.party-card:hover {
+  background: #222;
+}
+
+/* LEFT SIDE */
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background: #4cafef;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* REMOVE BUTTON */
+.remove-btn {
+  background: #ff4d4d;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  transition: 0.2s;
+}
+
+.remove-btn:hover {
+  background: #e03a3a;
+}
+
+/* EMPTY */
+.empty {
+  opacity: 0.6;
+}
+
+.title{
+ color: #1a1a1a;
+}
