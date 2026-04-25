@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import "./transportation.css";
 
 export default function Transportation() {
+  const { tripId } = useParams();
+
+  const API_BASE = "http://localhost:8081";
+
   const [form, setForm] = useState({
     type: "flight",
     title: "",
@@ -17,50 +22,133 @@ export default function Transportation() {
   const [items, setItems] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
+  const token = localStorage.getItem("token");
+
+  // 📥 GET ALL TRANSPORTATION
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/transportation/trip/${tripId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          console.error("Failed to fetch transportation");
+          return;
+        }
+
+        const data = await res.json();
+        setItems(data);
+      } catch (err) {
+        console.error("Network error:", err);
+      }
+    };
+
+    fetchData();
+  }, [tripId]);
+
+  // ✏️ FORM CHANGE
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  // ➕ CREATE / ✏️ UPDATE
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingId) {
-      setItems(items.map((item) => (item.id === editingId ? { ...form, id: editingId } : item)));
-      setEditingId(null);
-    } else {
-      setItems([...items, { ...form, id: Date.now() }]);
-    }
+    const isEditing = Boolean(editingId);
 
-    setForm({
-      type: "flight",
-      title: "",
-      departure: "",
-      arrival: "",
-      departTime: "",
-      arriveTime: "",
-      carrier: "",
-      confirmation: "",
-      notes: "",
-    });
+    const url = isEditing
+      ? `${API_BASE}/api/transportation/${editingId}`
+      : `${API_BASE}/api/transportation/trip/${tripId}`;
+
+    const method = isEditing ? "PUT" : "POST";
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        console.error("Save failed");
+        return;
+      }
+
+      const data = await res.json();
+
+      if (isEditing) {
+        setItems((prev) =>
+          prev.map((item) => (item.id === editingId ? data : item))
+        );
+        setEditingId(null);
+      } else {
+        setItems((prev) => [...prev, data]);
+      }
+
+      // reset form
+      setForm({
+        type: "flight",
+        title: "",
+        departure: "",
+        arrival: "",
+        departTime: "",
+        arriveTime: "",
+        carrier: "",
+        confirmation: "",
+        notes: "",
+      });
+    } catch (err) {
+      console.error("Submit error:", err);
+    }
   };
 
+  // ✏️ EDIT
   const handleEdit = (item) => {
-    setForm(item);
-    setEditingId(item.id);
+    const { id, ...rest } = item;
+    setForm(rest);
+    setEditingId(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const removeItem = (id) => {
-    setItems(items.filter((item) => item.id !== id));
-    if (editingId === id) setEditingId(null);
+  // ❌ DELETE
+  const removeItem = async (id) => {
+    try {
+      await fetch(`${API_BASE}/api/transportation/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setItems((prev) => prev.filter((item) => item.id !== id));
+
+      if (editingId === id) {
+        setEditingId(null);
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
   };
 
   return (
     <div className="transport-page">
+
       <p>Transportation</p>
 
+      {/* FORM */}
       <form className="transport-form" onSubmit={handleSubmit}>
+
         <div className="row">
           <select name="type" value={form.type} onChange={handleChange}>
             <option value="flight">Flight</option>
@@ -111,7 +199,7 @@ export default function Transportation() {
         <div className="row">
           <input
             name="carrier"
-            placeholder="Airline/Train System"
+            placeholder="Airline / Transport"
             value={form.carrier}
             onChange={handleChange}
           />
@@ -136,12 +224,15 @@ export default function Transportation() {
         </button>
       </form>
 
+      {/* LIST */}
       <div className="transport-list">
         {items.map((item) => (
           <div key={item.id} className="transport-card">
+
             <div className="card-header">
               <h3>{item.title || item.type.toUpperCase()}</h3>
-              <div>
+
+              <div className="card-actions">
                 <button onClick={() => handleEdit(item)}>✏️</button>
                 <button onClick={() => removeItem(item.id)}>✕</button>
               </div>
@@ -152,8 +243,11 @@ export default function Transportation() {
             </p>
 
             <p>
-              {item.departTime && new Date(item.departTime).toLocaleString()} →{" "}
-              {item.arriveTime && new Date(item.arriveTime).toLocaleString()}
+              {item.departTime &&
+                new Date(item.departTime).toLocaleString()}{" "}
+              →{" "}
+              {item.arriveTime &&
+                new Date(item.arriveTime).toLocaleString()}
             </p>
 
             {item.carrier && <p>Carrier: {item.carrier}</p>}
