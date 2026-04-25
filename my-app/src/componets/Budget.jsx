@@ -78,15 +78,23 @@ export default function Budget() {
     }
   };
 
-  /* ================= CALCULATIONS ================= */
+  /* ================= FIXED TOTAL ================= */
 
-  const spent = expenses.reduce((sum, e) => sum + (e.cost || 0), 0);
+  const spent = expenses.reduce((sum, e) => {
+    return sum + Number(e.cost);
+  }, 0);
 
   const remaining = budget?.idealBudget
     ? budget.idealBudget - spent
     : null;
 
   const hasBudget = budget !== null;
+
+  const formatMoney = (num) =>
+    Number(num || 0).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
   /* ================= BUDGET ================= */
 
@@ -160,25 +168,25 @@ export default function Budget() {
       <div className="summary-grid">
         <div className="card">
           <p>Total Spent</p>
-          <h2>${spent}</h2>
+          <h2>${formatMoney(spent)}</h2>
         </div>
 
         {hasBudget && (
           <>
             <div className="card">
               <p>Total Budget</p>
-              <h2>${budget.idealBudget}</h2>
+              <h2>${formatMoney(budget.idealBudget)}</h2>
             </div>
 
             <div className={`card ${remaining < 0 ? "negative" : "positive"}`}>
               <p>Remaining</p>
-              <h2>${remaining}</h2>
+              <h2>${formatMoney(remaining)}</h2>
             </div>
           </>
         )}
       </div>
 
-      {/* EXPENSES */}
+      {/* EXPENSES LIST */}
       <div className="expenses">
         <h2>Expenses</h2>
 
@@ -198,10 +206,7 @@ export default function Budget() {
                     value={exp.name}
                     onChange={(e) => {
                       const updated = [...expenses];
-                      updated[index] = {
-                        ...updated[index],
-                        name: e.target.value,
-                      };
+                      updated[index].name = e.target.value;
                       setExpenses(updated);
                     }}
                   />
@@ -211,10 +216,7 @@ export default function Budget() {
                     value={exp.cost}
                     onChange={(e) => {
                       const updated = [...expenses];
-                      updated[index] = {
-                        ...updated[index],
-                        cost: Number(e.target.value),
-                      };
+                      updated[index].cost = Number(e.target.value);
                       setExpenses(updated);
                     }}
                   />
@@ -226,7 +228,9 @@ export default function Budget() {
               ) : (
                 <>
                   <span>{exp.name}</span>
-                  <span className="amount">${exp.cost}</span>
+                  <span className="amount">
+                    ${formatMoney(exp.cost)}
+                  </span>
 
                   <div className="row-actions">
                     <button onClick={() => setEditingIndex(index)}>
@@ -242,7 +246,6 @@ export default function Budget() {
                   </div>
                 </>
               )}
-
             </div>
           );
         })}

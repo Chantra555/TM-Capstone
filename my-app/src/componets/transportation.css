@@ -1,0 +1,161 @@
+/* GLOBAL SAFETY FIX */
+* {
+  box-sizing: border-box;
+}
+
+/* PAGE */
+.transport-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* HEADER FIX (was collapsing before) */
+.transport-page h1 {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 0 20px;
+  color: aliceblue;
+}
+
+/* FORM CARD */
+.transport-form {
+  width: 100%;
+  max-width: 700px;
+  background: #1a1a1a;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ROW GRID */
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+/* 🔥 HARD INPUT CONTAINMENT FIX */
+.transport-form input,
+.transport-form select,
+.transport-form textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;          /* critical */
+  box-sizing: border-box; /* critical */
+
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #6d6d6d;
+  background: #888585;
+  color: #fff;
+  outline: none;
+}
+
+/* PLACEHOLDER */
+.transport-form input::placeholder,
+.transport-form textarea::placeholder {
+  color: black;
+  opacity: 1;
+}
+
+/* TEXTAREA */
+.transport-form textarea {
+  min-height: 100px;
+  resize: vertical;
+  
+}
+
+/* ✅ GOLD BUTTON (fixed) */
+.transport-form button {
+  background: #d4af37; /* gold */
+  color: black;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.transport-form button:hover {
+  background: #b8962e;
+}
+
+/* LIST */
+.transport-list {
+  width: 100%;
+  max-width: 700px;
+  margin-top: 30px;
+ color: #fff;
+
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* CARD */
+.transport-card {
+    font-family:Georgia, 'Times New Roman', Times, serif ;
+  background: #545050;
+  padding: 20px;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+/* CARD HEADER */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card-header h3 {
+  margin: 0;
+}
+
+/* DELETE BUTTON */
+.card-header button {
+  background: transparent;
+  border: none;
+  color: #ff6b6b;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* TEXT */
+.transport-card p {
+  margin: 6px 0;
+
+}
+
+/* NOTES */
+.notes {
+  color: #a4a2a2;
+  font-size: 14px;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+p{
+    color: #1a1a1a;
+    font-size:25px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}

@@ -1,116 +1,142 @@
-/* GLOBAL RESET */
+/* ================= GLOBAL ================= */
+
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: #f6f7fb;
-  color: #111827;
+  font-family: "Georgia", "Times New Roman", serif;
+  background: #0f0f12;
+  color: #f5f5f5;
 }
 
-/* PAGE WRAPPER */
+/* ================= PAGE WRAPPER ================= */
+
 .trips-page {
   max-width: 1000px;
   margin: 0 auto;
   padding: 48px 24px;
 }
 
-/* TITLE (FORCE VISIBILITY) */
+/* ================= TITLE ================= */
+
 .trips-title {
   font-size: 30px;
-  font-family: Georgia, 'Times New Roman', Times, serif;
   font-weight: 400;
   margin-bottom: 28px;
-  color: #000000;
+  color: #f5f5f5;
   letter-spacing: -0.3px;
 }
 
-/* GRID */
+/* ================= SECTION HEADERS ================= */
+
+.section-title {
+  margin: 28px 0 14px;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(245, 245, 245, 0.9);
+  border-left: 3px solid rgba(255, 215, 0, 0.4);
+  padding-left: 10px;
+}
+
+.section-title.past {
+  opacity: 0.6;
+}
+
+/* ================= GRID ================= */
+
 .trips-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 18px;
 }
 
+/* ================= CARD ================= */
 
-/* CARD */
 .trip-card {
-  background: #ffffff;
-  border-radius: 5px;
-  padding: 20px 5px;
+  padding: 16px 16px 14px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(to top, #ff9966, #ff5e62, #1e3c72);
+  border: 1px solid rgba(255, 215, 0, 0.18);
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+
   cursor: pointer;
 
-  border: 1px solid #c6a769;
-    background: linear-gradient(to top, #ff9966, #ff5e62, #1e3c72);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* HOVER */
 .trip-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.5);
 }
 
-/* ACTIVE CLICK */
-.trip-card:active {
-  transform: scale(0.99);
+/* ================= CLICK AREA ================= */
+
+.trip-click {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
 }
 
-/* TEXT */
+/* ================= TEXT HIERARCHY ================= */
+
 .trip-name {
-  font-size: 18px;
+  font-size: 25px;
   font-weight: 500;
-  margin-bottom: 6px;
-  color: #111827;
+  margin: 0;
   font-family: Georgia, 'Times New Roman', Times, serif;
+  
+  color: #f5f5f5;
 }
 
-.trip-dates {
+/* date sits clearly below title */
+.trip-datez {
+  font-size: 14px;
+  color: rgb(255, 236, 114);
+
+  margin-bottom: 6px;
+}
+
+/* optional extra info spacing */
+.trip-meta {
   font-size: 13px;
-  color: #6b7280;
+  color: rgba(245, 245, 245, 0.6);
 }
 
-/* EMPTY STATE */
+/* ================= EMPTY STATE ================= */
+
 .empty-text {
-  color: #ffffff;
+  color: rgba(245, 245, 245, 0.6);
   font-size: 15px;
   margin-top: 20px;
 }
-.trip-dates {
-  font-size: 14px;
-  color: #ebe833d6;
-  white-space: nowrap;
- 
-}
-.section-title {
-  margin-top: 30px;
-  margin-bottom: 10px;
-  font-size: 20px;
-  font-weight: 600;
-}
 
-.section-title.past {
-  opacity: 0.7;
-}
+/* ================= DELETE BUTTON ================= */
 
-/* make card clickable area separate */
-.trip-click {
-  cursor: pointer;
-}
-
-/* delete button */
 .delete-btn {
   margin-top: 10px;
+  align-self: flex-start;
+
   padding: 6px 10px;
-  background: #ff4d4f;
+
+  background: rgba(185, 28, 28, 0.8);
   border: none;
+
   color: white;
+
   border-radius: 6px;
   cursor: pointer;
+
   font-size: 12px;
+
   transition: 0.2s;
 }
 
 .delete-btn:hover {
-  background: #d9363e;
+  background: rgba(220, 38, 38, 0.9);
 }

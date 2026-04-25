@@ -7,13 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-public class CustomUserDetailsService implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
     private final Long id;
     private final String username;
     private final String password;
 
-    public CustomUserDetailsService(User user) {
+    public CustomUserDetails(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPasswordHash();

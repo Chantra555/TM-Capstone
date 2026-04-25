@@ -34,30 +34,32 @@ export default function Login({ onLogin }) {
         throw new Error(isSignup ? "Signup failed" : "Login failed");
       }
 
+      const data = await response.json();
+
       // =========================
       // LOGIN FLOW
       // =========================
       if (!isSignup) {
-        const data = await response.json(); // ✅ FIXED HERE
         const token = data.token;
 
         if (!token) {
           throw new Error("No token received from server");
         }
 
+        // ✅ FIX: store EVERYTHING Party needs
         localStorage.setItem("token", token);
-        localStorage.setItem("user", username);
+        localStorage.setItem("userId", data.userId);       // 🔥 IMPORTANT FIX
+        localStorage.setItem("username", data.username);   // 🔥 IMPORTANT FIX
 
-        if (onLogin) onLogin(username);
+        if (onLogin) onLogin(data.username);
 
-        navigate("/");
+        navigate("/trips"); // (better than "/")
         return;
       }
 
       // =========================
       // SIGNUP FLOW
       // =========================
-      const data = await response.json();
       console.log("Signup success:", data);
 
       setIsSignup(false);

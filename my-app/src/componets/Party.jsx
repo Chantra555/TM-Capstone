@@ -1,71 +1,149 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import "./party.css";
 
 export default function Party() {
-  const [party, setParty] = useState([
-    
-  ]);
+  const { tripId } = useParams(); // ✅ FIX: get ID from URL
 
-  const [name, setName] = useState("");
+  const [owner, setOwner] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [usernameToAdd, setUsernameToAdd] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // ADD PERSON
-  const addPerson = () => {
-    if (!name.trim()) return;
+  const token = localStorage.getItem("token");
+  const currentUserId = localStorage.getItem("userId");
 
-    const newPerson = {
-      id: Date.now(),
-      name: name.trim(),
-    };
+  const isOwner =
+  owner &&
+  currentUserId &&
+  Number(owner.id) === Number(currentUserId);
+  console.log("OWNER ID:", owner?.id);
+console.log("CURRENT USER ID:", currentUserId);
+console.log("IS OWNER:", isOwner);
 
-    setParty(prev => [...prev, newPerson]);
-    setName("");
+
+  // =========================
+  // FETCH MEMBERS
+  // =========================
+  const fetchMembers = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8081/api/trips/${tripId}/members`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed members fetch");
+
+      const data = await res.json();
+
+      setOwner(data.owner);
+      setMembers(data.members || []);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed loading party", err);
+    }
   };
 
-  // REMOVE PERSON
-  const removePerson = (id) => {
-    setParty(prev => prev.filter(p => p.id !== id));
+  useEffect(() => {
+    if (!tripId) return;
+    fetchMembers();
+  }, [tripId]);
+
+  // =========================
+  // ADD USER BY USERNAME
+  // =========================
+  const handleAddUser = async () => {
+    if (!usernameToAdd) return;
+
+    try {
+      await fetch(
+        `http://localhost:8081/api/trips/${tripId}/members/by-username/${usernameToAdd}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setUsernameToAdd("");
+      fetchMembers();
+    } catch (err) {
+      console.error("Failed to add user", err);
+    }
   };
+
+  // =========================
+  // REMOVE USER
+  // =========================
+  const handleRemoveUser = async (userId) => {
+    try {
+      await fetch(
+        `http://localhost:8081/api/trips/${tripId}/members/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchMembers();
+    } catch (err) {
+      console.error("Failed to remove user", err);
+    }
+  };
+
+  // =========================
+  // LOADING STATE
+  // =========================
+  if (loading) return <div className="members-card">Loading party...</div>;
 
   return (
-    <div className="party-page">
-      <h2 className="title">Trip Party 🎉</h2>
+    <div className="members-card">
+      <h2>👥 Party Members</h2>
 
-      {/* ADD SECTION */}
-      <div className="add-row">
-        <input
-          type="text"
-          placeholder="Enter name..."
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addPerson()}
-        />
-        <button onClick={addPerson}>Add</button>
+      {/* OWNER */}
+      <div className="owner-info">
+        👑 Owner: {owner?.username}
       </div>
 
-      {/* LIST */}
-      <div className="party-list">
-        {party.length === 0 ? (
-          <p className="empty">No one added yet</p>
+      {/* MEMBERS */}
+      <div className="members-list">
+        {members.length === 0 ? (
+          <p>No members yet.</p>
         ) : (
-          party.map(person => (
-            <div key={person.id} className="party-card">
-              <div className="left">
-                <div className="avatar">
-                  {person.name.charAt(0).toUpperCase()}
-                </div>
-                <span>{person.name}</span>
-              </div>
+          members.map((member) => (
+            <div key={member.id} className="member-row">
+              <span>👤 {member.username}</span>
 
-              <button
-                className="remove-btn"
-                onClick={() => removePerson(person.id)}
-              >
-                Remove
-              </button>
+              {isOwner && (
+                <button onClick={() => handleRemoveUser(member.id)}>
+                  ❌
+                </button>
+              )}
             </div>
           ))
         )}
       </div>
+
+      {/* ADD MEMBER */}
+      {isOwner && (
+        <div className="add-member">
+          <input
+            type="text"
+            placeholder="Enter username"
+            value={usernameToAdd}
+            onChange={(e) => setUsernameToAdd(e.target.value)}
+          />
+
+          <button onClick={handleAddUser}>➕ Add User</button>
+        </div>
+      )}
     </div>
   );
 }

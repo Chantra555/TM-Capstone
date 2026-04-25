@@ -27,6 +27,7 @@ public class AuthController {
     // =========================
     @PostMapping("/signup")
     public UserResponse signup(@RequestBody UserRequest request) {
+
         try {
             User user = userService.signup(
                     request.getName(),
@@ -41,7 +42,10 @@ public class AuthController {
             );
 
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    e.getMessage()
+            );
         }
     }
 
@@ -50,6 +54,7 @@ public class AuthController {
     // =========================
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
+
         try {
             User user = userService.login(
                     request.getUsername(),
@@ -58,29 +63,45 @@ public class AuthController {
 
             String token = jwtUtil.generateToken(user.getUsername());
 
-            return new LoginResponse(token);
+            return new LoginResponse(
+                    token,
+                    user.getId(),
+                    user.getUsername()
+            );
 
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    e.getMessage()
+            );
         }
     }
 
     // =========================
-    // RESPONSE WRAPPER (IMPORTANT)
+    // LOGIN RESPONSE
     // =========================
     public static class LoginResponse {
-        private String token;
 
-        public LoginResponse(String token) {
+        private String token;
+        private Long userId;
+        private String username;
+
+        public LoginResponse(String token, Long userId, String username) {
             this.token = token;
+            this.userId = userId;
+            this.username = username;
         }
 
         public String getToken() {
             return token;
         }
 
-        public void setToken(String token) {
-            this.token = token;
+        public Long getUserId() {
+            return userId;
+        }
+
+        public String getUsername() {
+            return username;
         }
     }
 }

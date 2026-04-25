@@ -72,19 +72,20 @@ public class Trip {
     }
 
     @ManyToOne
-    @JoinColumn(name = "user_id") // this matches your SQL column
-    private User user;
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
     @OneToOne(mappedBy = "trip", cascade = CascadeType.ALL)
     private Budget budget;
 
-
-    public User getUser() {
-        return user;
+    public User getOwner() {
+        return owner;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
-
 }
+
+
+

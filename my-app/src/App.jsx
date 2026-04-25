@@ -11,9 +11,10 @@ import Budget from "./componets/Budget.jsx";
 import TripLayout from "./componets/TripLayout.jsx";
 import TripOverview from "./componets/TripOverview.jsx";
 import Itinerary from "./componets/Itinerary.jsx";
-import Documents from "./componets/Documents.jsx";
+
 import Party from "./componets/Party.jsx";
 import Lodging from "./componets/Lodging.jsx";
+import Transportation from "./componets/Transportation.jsx";
 import "./style.css";
 
 function App() {
@@ -47,9 +48,10 @@ function App() {
           <Route index element={<TripOverview />} />
           <Route path="itinerary" element={<Itinerary />} />
           <Route path="budget" element={<Budget />} />
-          <Route path ="documents" element={<Documents />} />
+          
           <Route path ="party" element={<Party />} />
           <Route path ="lodging" element={<Lodging />} />
+          <Route path ="transportation" element={<Transportation/>} />
         </Route>
       </Routes>
     </BrowserRouter>

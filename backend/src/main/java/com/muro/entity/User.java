@@ -27,7 +27,7 @@ public class User {
 
     // 🔥 FIXED RELATION (THIS IS OPTION B)
     @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Trip> trips;
 
     public User() {}

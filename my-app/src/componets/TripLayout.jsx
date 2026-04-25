@@ -26,15 +26,13 @@ export default function TripLayout() {
             Budget
           </NavLink>
 
-          <NavLink to={`/trips/${tripId}/documents`} className="nav-item">
-            Documents
-          </NavLink>
+          
 
            <NavLink to={`/trips/${tripId}/lodging`} className="nav-item">
             Lodging
           </NavLink>
 
-           <NavLink to={`/trips/${tripId}/transportaion`} className="nav-item">
+           <NavLink to={`/trips/${tripId}/transportation`} className="nav-item">
             Transportation 
           </NavLink>
 

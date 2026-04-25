@@ -4,157 +4,195 @@ import "./trip.css";
 
 export default function Trips() {
   const [trips, setTrips] = useState([]);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  /* ================= FETCH TRIPS ================= */
   useEffect(() => {
     if (!token) {
       navigate("/login");
       return;
     }
 
-    fetch("http://localhost:8081/api/trips", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
+    const fetchTrips = async () => {
+      try {
+        setLoading(true);
+
+        const res = await fetch("http://localhost:8081/api/trips", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (!res.ok) throw new Error("Failed to fetch trips");
-        return res.json();
-      })
-      .then((data) => {
-        setTrips(Array.isArray(data) ? data : []);
-      })
-      .catch((err) => console.error(err));
+
+        const data = await res.json();
+        const baseTrips = Array.isArray(data) ? data : [];
+
+        // 🔥 ENRICH TRIPS WITH MEMBER COUNTS
+        const enrichedTrips = await Promise.all(
+          baseTrips.map(async (trip) => {
+            try {
+              const membersRes = await fetch(
+                `http://localhost:8081/api/trips/${trip.id}/members`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (!membersRes.ok) throw new Error();
+
+              const membersData = await membersRes.json();
+
+              return {
+                ...trip,
+                membersCount: membersData.members?.length || 0,
+                owner: membersData.owner || trip.owner,
+              };
+            } catch {
+              return {
+                ...trip,
+                membersCount: 0,
+              };
+            }
+          })
+        );
+
+        setTrips(enrichedTrips);
+      } catch (err) {
+        console.error("FETCH ERROR:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrips();
   }, [token, navigate]);
 
-  // ✅ DELETE FUNCTION
-const handleDelete = (tripId) => {
-  if (!window.confirm("Delete this trip?")) return;
+  /* ================= DELETE TRIP ================= */
+  const handleDelete = async (tripId) => {
+    if (!window.confirm("Delete this trip?")) return;
 
-  console.log("DELETE TOKEN:", token);
-
-  fetch(`http://localhost:8081/api/trips/${tripId}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => {
-      if (!res.ok) {
-        return res.text().then((text) => {
-          throw new Error(text || "Delete failed");
-        });
-      }
-
-      setTrips((prev) =>
-        prev.filter((t) => (t.id ?? t.tripId) !== tripId)
+    try {
+      const res = await fetch(
+        `http://localhost:8081/api/trips/${tripId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-    })
-    .catch((err) => console.error("DELETE ERROR:", err.message));
-};
 
+      if (!res.ok) throw new Error("Delete failed");
 
-  // ✅ SPLIT TRIPS
-const today = new Date();
-today.setHours(0, 0, 0, 0); // normalize to start of day
+      setTrips((prev) => prev.filter((t) => t.id !== tripId));
+    } catch (err) {
+      console.error("DELETE ERROR:", err);
+    }
+  };
 
-const normalizeDate = (dateStr) => {
-  const d = new Date(dateStr);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
+  /* ================= DATE HELPERS ================= */
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-const currentTrips = trips.filter((trip) => {
-  if (!trip.endDate) return false;
-  return normalizeDate(trip.endDate) >= today;
-});
+  const normalizeDate = (dateStr) => {
+    const d = new Date(dateStr);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
 
-const pastTrips = trips.filter((trip) => {
-  if (!trip.endDate) return false;
-  return normalizeDate(trip.endDate) < today;
-});
+  const currentTrips = trips.filter(
+    (trip) => trip.endDate && normalizeDate(trip.endDate) >= today
+  );
 
+  const pastTrips = trips.filter(
+    (trip) => trip.endDate && normalizeDate(trip.endDate) < today
+  );
 
-
-  // ✅ CARD RENDER
+  /* ================= RENDER ================= */
   const renderTrips = (tripList) => {
-    if (tripList.length === 0) {
+    if (!tripList.length) {
       return <p className="empty-text">No trips found.</p>;
     }
 
     return (
       <div className="trips-grid">
-        {tripList.map((trip) => {
-          const tripId = trip.id ?? trip.tripId;
+        {tripList.map((trip) => (
+          <div key={trip.id} className="trip-card">
 
-          return (
-            <div key={tripId} className="trip-card">
-              <div
-                className="trip-click"
-                onClick={() => navigate(`/trips/${tripId}`)}
-              >
-                <h3 className="trip-name">{trip.name}</h3>
-                  <p className="trip-dates">
-                    {trip.startDate &&
-                      new Date(trip.startDate).toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+            <div
+              className="trip-click"
+              onClick={() => navigate(`/trips/${trip.id}`)}
+            >
+              <h3 className="trip-name">{trip.name}</h3>
 
-                    {" → "}
+              <p className="trip-owner">
+                👑 {trip.owner?.username || "Unknown"}
+              </p>
 
-                    {trip.endDate &&
-                      new Date(trip.endDate).toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                  </p>
+              <p className="trip-datez">
+                {trip.startDate &&
+                  new Date(trip.startDate).toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
 
-              </div>
+                {" → "}
 
-              {/* ✅ DELETE BUTTON */}
-              <button
-                className="delete-btn"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevents card click
-                  handleDelete(tripId);
-                }}
-              >
-                Delete
-              </button>
+                {trip.endDate &&
+                  new Date(trip.endDate).toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+              </p>
+
+              <p className="trip-members">
+                👥 {trip.membersCount ?? 0} members
+              </p>
             </div>
-          );
-        })}
+
+            <button
+              className="delete-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(trip.id);
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
       </div>
     );
   };
 
+  if (loading) return <div className="loading">Loading trips...</div>;
+
   return (
-  <div className="trips-page">
-    <h2 className="trips-title">Your Trips</h2>
+    <div className="trips-page">
+      <h2 className="trips-title">Your Trips</h2>
 
-    {/* CURRENT TRIPS */}
-    {currentTrips.length === 0 ? (
-      <p className="empty-text">No active trips.</p>
-    ) : (
-      renderTrips(currentTrips)
-    )}
+      {currentTrips.length > 0 ? (
+        renderTrips(currentTrips)
+      ) : (
+        <p className="empty-text">No active trips.</p>
+      )}
 
-    {/* PAST TRIPS */}
-    {pastTrips.length > 0 && (
-      <>
-        <h3 className="section-title past">Past Trips</h3>
-        {renderTrips(pastTrips)}
-      </>
-    )}
-  </div>
-);
-
+      {pastTrips.length > 0 && (
+        <>
+          <h3 className="section-title past">Past Trips</h3>
+          {renderTrips(pastTrips)}
+        </>
+      )}
+    </div>
+  );
 }
