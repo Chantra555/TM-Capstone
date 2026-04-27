@@ -108,4 +108,5 @@ public class TripMemberController {
 
         return ResponseEntity.ok(response);
     }
+
 }

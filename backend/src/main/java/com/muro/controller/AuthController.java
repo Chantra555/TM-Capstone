@@ -4,7 +4,7 @@ import com.muro.dto.LoginRequest;
 import com.muro.dto.UserRequest;
 import com.muro.dto.UserResponse;
 import com.muro.entity.User;
-import com.muro.security.JwtUtil;
+import com.muro.JwtUtil;
 import com.muro.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

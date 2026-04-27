@@ -1,6 +1,6 @@
 package com.muro.config;
 
-import com.muro.security.JwtFilter;
+import com.muro.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

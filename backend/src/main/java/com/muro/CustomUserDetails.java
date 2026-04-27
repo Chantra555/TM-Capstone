@@ -1,4 +1,4 @@
-package com.muro.security;
+package com.muro;
 
 import com.muro.entity.User;
 import org.springframework.security.core.GrantedAuthority;

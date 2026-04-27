@@ -1,4 +1,4 @@
-package com.muro.security;
+package com.muro;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
