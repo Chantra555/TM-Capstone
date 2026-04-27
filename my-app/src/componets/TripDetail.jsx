@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-// Trip Overview tab //
+// PAGE NOT IN USE //
 
 export default function TripDetail() {
   const { id } = useParams();
@@ -93,7 +93,7 @@ export default function TripDetail() {
           border: "none",
           borderRadius: "8px",
           cursor: "pointer",
-          background: "#111827",
+          background: "#0a42bd",
           color: "white",
         }}
       >

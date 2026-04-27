@@ -32,9 +32,21 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // ✅ EXCLUDE SWAGGER & OPEN API DOCS
+        if (path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String header = request.getHeader("Authorization");
 
-        // No token → continue normally
+        // No token → continue normally (important for public endpoints)
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -44,11 +56,11 @@ public class JwtFilter extends OncePerRequestFilter {
         String username;
 
         try {
-            // 🔥 THIS is where SignatureException can happen
+            // 🔥 Extract username from JWT
             username = jwtUtil.extractUsername(token);
 
         } catch (JwtException e) {
-            // ❌ Invalid token → clear context and reject cleanly
+            // ❌ Invalid or expired token
             SecurityContextHolder.clearContext();
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -56,13 +68,14 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Already authenticated → skip
+        // Only authenticate if not already authenticated
         if (username != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(username);
 
+            // Validate token
             if (jwtUtil.isTokenValid(token, userDetails)) {
 
                 UsernamePasswordAuthenticationToken auth =

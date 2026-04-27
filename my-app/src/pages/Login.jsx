@@ -48,12 +48,12 @@ export default function Login({ onLogin }) {
 
         // ✅ FIX: store EVERYTHING Party needs
         localStorage.setItem("token", token);
-        localStorage.setItem("userId", data.userId);       // 🔥 IMPORTANT FIX
-        localStorage.setItem("username", data.username);   // 🔥 IMPORTANT FIX
+        localStorage.setItem("userId", data.userId);       
+        localStorage.setItem("username", data.username);   
 
         if (onLogin) onLogin(data.username);
 
-        navigate("/trips"); // (better than "/")
+        navigate("/trips"); 
         return;
       }
 

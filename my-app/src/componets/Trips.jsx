@@ -31,7 +31,7 @@ export default function Trips() {
         const data = await res.json();
         const baseTrips = Array.isArray(data) ? data : [];
 
-        // 🔥 ENRICH TRIPS WITH MEMBER COUNTS
+        // ENRICH TRIPS WITH MEMBER COUNTS
         const enrichedTrips = await Promise.all(
           baseTrips.map(async (trip) => {
             try {

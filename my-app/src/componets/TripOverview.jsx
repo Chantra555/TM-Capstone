@@ -330,7 +330,7 @@ export default function TripOverview() {
         </div>
       </div>
 
-      {/* ✅ LODGING (ONLY NEW SECTION ADDED) */}
+      {/* Lodding */}
       <div className="section">
         <h2>Lodging</h2>
 

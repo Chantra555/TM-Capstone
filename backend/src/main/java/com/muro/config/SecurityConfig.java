@@ -22,26 +22,28 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
 
         http
-                // ❌ disable CSRF for stateless APIs
                 .csrf(csrf -> csrf.disable())
-
-                // ✅ proper CORS hookup
                 .cors(cors -> {})
-
-                // ❌ stateless session (JWT)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // 🔓 public endpoints
+                        // 🔓 PUBLIC ENDPOINTS
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // 🔒 protected endpoints
+                        // 🔓 SWAGGER (IMPORTANT FIX)
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // 🔒 PROTECTED ENDPOINTS
                         .requestMatchers("/api/expense/**").authenticated()
                         .requestMatchers("/api/budget/**").authenticated()
                         .requestMatchers("/api/trips/**").authenticated()
@@ -49,11 +51,10 @@ public class SecurityConfig {
                         // allow preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // everything else secured
                         .anyRequest().authenticated()
                 )
 
-                // 🔥 JWT filter before Spring Security
+                // 🔥 JWT FILTER
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -88,7 +89,7 @@ public class SecurityConfig {
     }
 
     // =========================
-    // AUTH MANAGER (LOGIN SUPPORT)
+    // AUTH MANAGER
     // =========================
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

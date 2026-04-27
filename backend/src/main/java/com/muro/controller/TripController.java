@@ -93,7 +93,7 @@ public class TripController {
 
 
     // --------------------------------------------------
-    // GET SINGLE TRIP (owner only for now) -- changed
+    // GET SINGLE TRIP (owner only for now) -- changed 2 trip if in
     // --------------------------------------------------
     @GetMapping("/{id}")
     public ResponseEntity<?> getTripById(
