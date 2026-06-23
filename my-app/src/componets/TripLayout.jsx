@@ -39,6 +39,11 @@ export default function TripLayout() {
             <NavLink to={`/trips/${tripId}/party`} className="nav-item">
             Party 
           </NavLink>
+
+          <NavLink to={`/trips/${tripId}/documents`} className="nav-item">
+            Documents 
+          </NavLink>
+          
          
           
 

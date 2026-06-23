@@ -250,7 +250,7 @@ export default function Transportation() {
                 new Date(item.arriveTime).toLocaleString()}
             </p>
 
-            {item.carrier && <p>Carrier: {item.carrier}</p>}
+            {item.carrier && <p>Transportation: {item.carrier}</p>}
             {item.confirmation && <p>Confirmation: {item.confirmation}</p>}
             {item.notes && <p className="notes">{item.notes}</p>}
           </div>
